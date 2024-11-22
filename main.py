@@ -9,19 +9,29 @@ from docx import Document
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-# Configurar la clave de API
+# Configurar la clave de API y la base URL
 load_dotenv()
-api_key = os.getenv("LLAMA_API_KEY")
-openai.api_key = api_key
+openai.api_key = os.getenv("AIML_API_KEY")
+openai.api_base = os.getenv("AIML_BASE_URL")
 
-# Función para analizar texto con la API de Llama
+# Función para analizar texto con la API
 def analyze_text(text):
-    response = openai.Completion.create(
-        model="text-davinci-003",
-        prompt=f"Analiza este texto en términos de coherencia interna y externa:\n{text}",
-        max_tokens=1000
-    )
-    return response.choices[0].text
+    system_prompt = "Eres un asistente que analiza texto en términos de coherencia y estructura."
+    user_prompt = f"Por favor analiza el siguiente texto:\n{text}"
+    
+    try:
+        response = openai.ChatCompletion.create(
+            model="mistralai/Mistral-7B-Instruct-v0.2",  # Cambiar según el modelo disponible
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            temperature=0.7,
+            max_tokens=1000
+        )
+        return response.choices[0]["message"]["content"]
+    except Exception as e:
+        return f"Error al procesar la solicitud: {e}"
 
 # Función para generar un reporte en Word
 def generate_report(text, analysis):
@@ -42,6 +52,7 @@ uploaded_file = st.file_uploader("Sube tu archivo (.docx, .pdf, .xlsx, .csv)", t
 
 if uploaded_file:
     file_type = uploaded_file.name.split('.')[-1]
+    
     if file_type == "docx":
         doc = docx.Document(uploaded_file)
         text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
@@ -64,7 +75,7 @@ if uploaded_file:
         st.write("Vista previa de los datos cargados:")
         st.dataframe(df)
 
-    # Análisis con la API de Llama
+    # Análisis con la API
     if file_type in ["docx", "pdf"]:
         analysis = analyze_text(text)
         st.write("Resultados del Análisis:")
