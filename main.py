@@ -21,15 +21,15 @@ def analyze_text(text):
     
     try:
         response = openai.ChatCompletion.create(
-            model="mistralai/Mistral-7B-Instruct-v0.2",  # Cambiar según el modelo disponible
+            model="gpt-3.5-turbo",  # Usa el modelo correcto disponible
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
+                {"role": "user", "content": user_prompt},
             ],
             temperature=0.7,
-            max_tokens=1000
+            max_tokens=500,
         )
-        return response.choices[0]["message"]["content"]
+        return response["choices"][0]["message"]["content"]
     except Exception as e:
         return f"Error al procesar la solicitud: {e}"
 
