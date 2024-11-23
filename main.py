@@ -15,7 +15,6 @@ openai.api_key = os.getenv("AIML_API_KEY")
 openai.api_base = os.getenv("AIML_BASE_URL")
 
 # Función para analizar texto con la API
-# Función para interactuar con el modelo Llama 3.1 70B Instruct Turbo
 def analyze_text_with_llama(text):
     system_prompt = "Eres un asistente que analiza texto académico en términos de coherencia y estructura."
     user_prompt = f"Por favor analiza el siguiente texto:\n{text}"
@@ -23,7 +22,7 @@ def analyze_text_with_llama(text):
     try:
         # Solicitud al modelo
         response = openai.ChatCompletion.create(
-            model="llama-3.1-70b-instruct-turbo",  # Nombre del modelo
+            model="gpt-3.5-turbo",  # Corrected model name
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -63,7 +62,7 @@ if uploaded_file:
 
     elif file_type == "pdf":
         pdf_reader = PdfReader(uploaded_file)
-        text = "\n".join([page.extract_text() for page in pdf_reader.pages])
+        text = "\n".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
         st.write("Contenido del documento:")
         st.text_area("Vista previa", text, height=300)
 
@@ -79,7 +78,7 @@ if uploaded_file:
 
     # Análisis con la API
     if file_type in ["docx", "pdf"]:
-        analysis = analyze_text(text)
+        analysis = analyze_text_with_llama(text)
         st.write("Resultados del Análisis:")
         st.text_area("Análisis", analysis, height=300)
 
