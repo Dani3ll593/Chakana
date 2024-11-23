@@ -22,7 +22,7 @@ def analyze_text_with_llama(text):
     try:
         # Solicitud al modelo
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Corrected model name
+            model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Corrected model name
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
