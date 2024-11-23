@@ -5,6 +5,7 @@ import docx
 from dotenv import load_dotenv
 import os
 import openai
+from openai.error import OpenAIError
 from docx import Document
 import matplotlib.pyplot as plt
 import plotly.express as px
@@ -12,9 +13,9 @@ import plotly.express as px
 # Configurar la clave de API y la base URL
 load_dotenv()
 openai.api_key = os.getenv("AIML_API_KEY")
-openai.api_base = os.getenv("AIML_BASE_URL")
+openai.api_base = os.getenv("AIML_BASE_URL")  # Base URL para acceder al modelo
 
-# Función para analizar texto con la API
+# Función para analizar texto con el modelo Meta-Llama
 def analyze_text_with_llama(text):
     system_prompt = "Eres un asistente que analiza texto académico en términos de coherencia y estructura."
     user_prompt = f"Por favor analiza el siguiente texto:\n{text}"
@@ -22,7 +23,7 @@ def analyze_text_with_llama(text):
     try:
         # Solicitud al modelo
         response = openai.ChatCompletion.create(
-            model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Corrected model name
+            model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Nombre del modelo
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": user_prompt}
@@ -31,7 +32,7 @@ def analyze_text_with_llama(text):
             max_tokens=1000,  # Máximo de palabras en la respuesta
         )
         return response["choices"][0]["message"]["content"]
-    except openai.error.OpenAIError as e:
+    except OpenAIError as e:
         return f"Error al procesar la solicitud: {e}"
 
 # Función para generar un reporte en Word
