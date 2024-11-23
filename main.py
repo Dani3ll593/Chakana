@@ -1,102 +1,89 @@
+import openai
+from dotenv import load_dotenv
+import os
 import streamlit as st
 import pandas as pd
 from PyPDF2 import PdfReader
 import docx
-from dotenv import load_dotenv
-import os
-import openai
-from openai.error import OpenAIError
-from docx import Document
-import matplotlib.pyplot as plt
-import plotly.express as px
 
-# Configurar la clave de API y la base URL
+
+# Cargar configuraciones del entorno
 load_dotenv()
 openai.api_key = os.getenv("AIML_API_KEY")
-openai.api_base = os.getenv("AIML_BASE_URL")  # Base URL para acceder al modelo
+openai.api_base = os.getenv("AIML_API_BASE")
 
-# Función para analizar texto con el modelo Meta-Llama
-def analyze_text_with_llama(text):
-    system_prompt = "Eres un asistente que analiza texto académico en términos de coherencia y estructura."
-    user_prompt = f"Por favor analiza el siguiente texto:\n{text}"
+# Función para interactuar con la API
+def analyze_text_with_api(text):
+    system_prompt = "Eres un asistente experto en análisis textual. Analiza el texto a nivel de coherencia interna y externa."
+    user_prompt = f"Texto para analizar:\n{text}"
     
     try:
-        # Solicitud al modelo
         response = openai.ChatCompletion.create(
-            model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Nombre del modelo
+            model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt}
+                {"role": "user", "content": user_prompt},
             ],
-            temperature=0.7,  # Nivel de creatividad del modelo
-            max_tokens=1000,  # Máximo de palabras en la respuesta
+            temperature=0.7,
+            max_tokens=1000,
         )
         return response["choices"][0]["message"]["content"]
-    except OpenAIError as e:
+    except Exception as e:
         return f"Error al procesar la solicitud: {e}"
 
-# Función para generar un reporte en Word
-def generate_report(text, analysis):
-    doc = Document()
-    doc.add_heading("Reporte de Análisis", level=1)
-    doc.add_heading("Texto Original", level=2)
-    doc.add_paragraph(text)
-    doc.add_heading("Resultados del Análisis", level=2)
-    doc.add_paragraph(analysis)
-    doc.save("reporte.docx")
-    return "reporte.docx"
 
-# Título de la aplicación
-st.title("Chakana: Asesor de Tesis")
 
-# Carga de documentos
-uploaded_file = st.file_uploader("Sube tu archivo (.docx, .pdf, .xlsx, .csv)", type=["docx", "pdf", "xlsx", "csv"])
+
+# Función para leer archivos .docx
+def read_docx(file):
+    doc = docx.Document(file)
+    return "\n".join([paragraph.text for paragraph in doc.paragraphs])
+
+# Función para leer archivos PDF
+def read_pdf(file):
+    pdf_reader = PdfReader(file)
+    return "\n".join([page.extract_text() for page in pdf_reader.pages])
+
+# Función para cargar y procesar archivos
+def process_uploaded_file(uploaded_file):
+    file_type = uploaded_file.name.split('.')[-1]
+
+    if file_type == "docx":
+        return read_docx(uploaded_file)
+    elif file_type == "pdf":
+        return read_pdf(uploaded_file)
+    elif file_type == "xlsx":
+        return pd.read_excel(uploaded_file)
+    elif file_type == "csv":
+        return pd.read_csv(uploaded_file)
+    else:
+        return "Formato no soportado. Por favor sube un archivo .docx, .pdf, .xlsx o .csv."
+
+
+
+# Configuración de la aplicación en Streamlit
+st.title("Análisis de Documentos con Llama")
+
+# Subida de archivos
+uploaded_file = st.file_uploader("Sube un archivo para análisis (.docx, .pdf, .xlsx, .csv)", type=["docx", "pdf", "xlsx", "csv"])
 
 if uploaded_file:
     file_type = uploaded_file.name.split('.')[-1]
-    
-    if file_type == "docx":
-        doc = docx.Document(uploaded_file)
-        text = "\n".join([paragraph.text for paragraph in doc.paragraphs])
-        st.write("Contenido del documento:")
-        st.text_area("Vista previa", text, height=300)
 
-    elif file_type == "pdf":
-        pdf_reader = PdfReader(uploaded_file)
-        text = "\n".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
-        st.write("Contenido del documento:")
-        st.text_area("Vista previa", text, height=300)
-
-    elif file_type == "xlsx":
-        df = pd.read_excel(uploaded_file)
-        st.write("Vista previa de los datos cargados:")
-        st.dataframe(df)
-
-    elif file_type == "csv":
-        df = pd.read_csv(uploaded_file)
-        st.write("Vista previa de los datos cargados:")
-        st.dataframe(df)
-
-    # Análisis con la API
+    # Procesar el archivo subido
     if file_type in ["docx", "pdf"]:
-        analysis = analyze_text_with_llama(text)
-        st.write("Resultados del Análisis:")
-        st.text_area("Análisis", analysis, height=300)
+        text_content = process_uploaded_file(uploaded_file)
+        st.write("Texto extraído:")
+        st.text_area("Vista previa", text_content, height=300)
 
-        # Generar reporte
-        if st.button("Generar Reporte"):
-            report_path = generate_report(text, analysis)
-            st.success("Reporte generado exitosamente.")
-            with open(report_path, "rb") as file:
-                st.download_button("Descargar Reporte", file, file_name="reporte.docx")
-
-    # Visualización de datos
-    if file_type in ["xlsx", "csv"]:
-        st.write("Visualización de Datos:")
-        fig, ax = plt.subplots()
-        df.plot(kind="bar", ax=ax)
-        st.pyplot(fig)
-
-        st.write("Gráfico Interactivo:")
-        fig = px.bar(df, x=df.columns[0], y=df.columns[1])
-        st.plotly_chart(fig)
+        # Enviar texto a la API
+        if st.button("Analizar con Llama"):
+            result = analyze_text_with_api(text_content)
+            st.write("Resultado del Análisis:")
+            st.text_area("Análisis", result, height=300)
+    elif file_type in ["xlsx", "csv"]:
+        data_content = process_uploaded_file(uploaded_file)
+        st.write("Vista previa de los datos:")
+        st.dataframe(data_content)
+    else:
+        st.error("Formato no soportado.")
