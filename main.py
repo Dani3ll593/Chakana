@@ -15,22 +15,24 @@ openai.api_key = os.getenv("AIML_API_KEY")
 openai.api_base = os.getenv("AIML_BASE_URL")
 
 # Función para analizar texto con la API
-def analyze_text(text):
-    system_prompt = "Eres un asistente que analiza texto en términos de coherencia y estructura."
+# Función para interactuar con el modelo Llama 3.1 70B Instruct Turbo
+def analyze_text_with_llama(text):
+    system_prompt = "Eres un asistente que analiza texto académico en términos de coherencia y estructura."
     user_prompt = f"Por favor analiza el siguiente texto:\n{text}"
     
     try:
+        # Solicitud al modelo
         response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",  # Usa el modelo correcto disponible
+            model="llama-3.1-70b-instruct-turbo",  # Nombre del modelo
             messages=[
                 {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
+                {"role": "user", "content": user_prompt}
             ],
-            temperature=0.7,
-            max_tokens=500,
+            temperature=0.7,  # Nivel de creatividad del modelo
+            max_tokens=1000,  # Máximo de palabras en la respuesta
         )
         return response["choices"][0]["message"]["content"]
-    except Exception as e:
+    except openai.error.OpenAIError as e:
         return f"Error al procesar la solicitud: {e}"
 
 # Función para generar un reporte en Word
