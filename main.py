@@ -8,17 +8,12 @@ import docx
 
 
 # Cargar configuraciones del entorno
-load_dotenv()
-openai.api_key = os.getenv("AIML_API_KEY")
-openai.api_base = os.getenv("AIML_API_BASE")
-
-# Función para interactuar con la API
 def analyze_text_with_api(text):
     system_prompt = "Eres un asistente experto en análisis textual. Analiza el texto a nivel de coherencia interna y externa."
     user_prompt = f"Texto para analizar:\n{text}"
     
     try:
-        response = openai.ChatCompletion.create(
+        response = openai.ChatCompletion.acreate(
             model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
             messages=[
                 {"role": "system", "content": system_prompt},
@@ -28,9 +23,8 @@ def analyze_text_with_api(text):
             max_tokens=1000,
         )
         return response["choices"][0]["message"]["content"]
-    except Exception as e:
+    except openai.OpenAIError as e:
         return f"Error al procesar la solicitud: {e}"
-
 
 
 
