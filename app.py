@@ -66,9 +66,8 @@ if uploaded_file:
             for section, comment in st.session_state.comments.items():
                 st.markdown(f"**{section}**")
                 st.write(comment)
-
-        # Export Comments
-        st.markdown("### 📤 Export Comments")
+# Export Comments and Generate Review Report
+st.markdown("### 📤 Export Comments")
 if st.button("Generate Review Report"):
     try:
         # Generate the review report
@@ -83,6 +82,7 @@ if st.button("Generate Review Report"):
             mime="text/plain",
         )
     except Exception as e:
+        # Handle errors during report generation
         st.error(f"Error generating the review report: {e}")
 
 else:
