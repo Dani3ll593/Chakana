@@ -1,63 +1,45 @@
 import os
-import requests
 from dotenv import load_dotenv
+import requests
 import json
 
-# Load environment variables
+# Load environment variables from .env
 load_dotenv()
 
+# Load the API key and base URL from environment variables
 API_BASE_URL = os.getenv("AIML_BASE_URL", "https://api.aimlapi.com/v1")
 API_KEY = os.getenv("AIML_API_KEY")
 
-
 def get_model_feedback(text):
     """
-    Sends text to the AI/ML API and retrieves feedback.
+    Sends text to the AI/ML API and retrieves AI feedback using the OpenAI-compatible API structure.
     """
     if not API_BASE_URL or not API_KEY:
-        raise ValueError("API_BASE_URL or API_KEY is not set in the environment.")
+        raise ValueError("API_BASE_URL or API_KEY is missing. Ensure .env is set up correctly.")
 
+    # Headers for the request
     headers = {
         "Authorization": f"Bearer {API_KEY}",
         "Content-Type": "application/json",
     }
 
-    # Construct the payload
+    # Payload for the API request
     payload = {
         "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
         "messages": [
-            {
-                "role": "system",
-                "content": (
-                    "You are an expert assistant for research writing analysis. Your task is to evaluate the provided "
-                    "text for its academic quality, coherence, and alignment with research objectives. Provide actionable "
-                    "feedback in detail, organized as follows:\n"
-                    "1. Writing Quality: Grammar, vocabulary, and tone.\n"
-                    "2. Coherence: Logical flow and transitions.\n"
-                    "3. Relevance: Alignment with research objectives.\n"
-                    "4. Recommendations: Specific steps for improvement.\n"
-                ),
-            },
-            {
-                "role": "user",
-                "content": text,
-            },
+            {"role": "system", "content": "You are an advanced AI assistant for research analysis."},
+            {"role": "user", "content": text},
         ],
-        "max_tokens": 1000,  # Adjust token limit based on expected feedback size
-        "stream": False,  # Set to True for real-time response (optional)
+        "max_tokens": 1000,
+        "temperature": 0.7,
     }
 
     # Make the API request
-    response = requests.post(
-        url=f"{API_BASE_URL}/chat/completions",
-        headers=headers,
-        data=json.dumps(payload),
-    )
-
-    # Handle response
-    if response.status_code == 200:
-        return response.json()["choices"][0]["message"]["content"].split("\n")
-    else:
-        raise Exception(
-            f"API error: {response.status_code} - {response.text}"
-        )
+    try:
+        response = requests.post(f"{API_BASE_URL}/chat/completions", headers=headers, data=json.dumps(payload))
+        response.raise_for_status()  # Raise an exception for HTTP errors
+        return response.json()["choices"][0]["message"]["content"]
+    except requests.exceptions.HTTPError as http_err:
+        raise Exception(f"HTTP error occurred: {http_err}")
+    except requests.exceptions.RequestException as req_err:
+        raise Exception(f"Request error occurred: {req_err}")
