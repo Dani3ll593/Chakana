@@ -28,18 +28,6 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #45a049;
     }
-    .highlight {
-        background-color: yellow;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    .comment-box {
-        margin-top: 10px;
-        padding: 10px;
-        border-left: 2px solid blue;
-        background-color: #f9f9f9;
-        font-size: 14px;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -66,7 +54,7 @@ if file:
         st.session_state['file_type'] = file_type
         st.success("✅ Documento cargado exitosamente.")
     
-    # Visualización del documento
+    # Visualización del documento con funcionalidad interactiva
     st.subheader("📄 Visualización del Documento")
     st.markdown("Interactúa con el texto subrayando y añadiendo comentarios.")
     col1, col2 = st.columns([3, 1])
@@ -82,39 +70,3 @@ if file:
                 )
         else:
             st.write("No hay comentarios aún. Selecciona texto en el documento para añadir comentarios.")
-
-# Sección: Análisis con IA
-if "document" in st.session_state:
-    st.markdown("---")
-    st.subheader("🧠 Análisis con Inteligencia Artificial")
-    st.write("Selecciona texto y utiliza el análisis asistido por IA para evaluar la calidad.")
-    if st.button("🔍 Analizar Texto Seleccionado"):
-        if "highlighted_text" in st.session_state:
-            with st.spinner("🔄 Enviando texto al modelo de IA..."):
-                analysis_results = analyze_text(st.session_state['highlighted_text'])
-                st.success("✅ Análisis completado.")
-                st.markdown("**Resultados del Análisis:**")
-                st.write(analysis_results)
-        else:
-            st.warning("⚠️ No se ha seleccionado texto para analizar.")
-
-# Persistencia y exportación
-if "document" in st.session_state:
-    st.markdown("---")
-    st.subheader("💾 Guardar y Exportar Anotaciones")
-    st.write("Guarda tus comentarios y subrayados para seguir trabajando más tarde o exporta el documento con anotaciones.")
-    col1, col2 = st.columns(2)
-    with col1:
-        if st.button("💾 Guardar Anotaciones"):
-            save_annotations()
-            st.success("✅ Anotaciones guardadas exitosamente.")
-    with col2:
-        if st.button("📤 Exportar Documento"):
-            export_document()
-            st.success("✅ Documento exportado exitosamente.")
-
-# Mensaje para usuarios nuevos
-if not file:
-    st.info(
-        "👈 Carga un documento para comenzar. Utiliza la barra lateral para explorar las herramientas."
-    )
