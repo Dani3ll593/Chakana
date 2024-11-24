@@ -6,38 +6,58 @@ def render_highlight_comment_section(document_content):
         <style>
         .highlight {
             background-color: yellow;
+            font-weight: bold;
             cursor: pointer;
         }
-        .comment {
+        .comment-box {
+            margin-top: 10px;
+            padding: 10px;
             border-left: 2px solid blue;
-            margin-left: 5px;
-            padding-left: 10px;
+            background-color: #f9f9f9;
+            font-size: 14px;
         }
         </style>
         """,
         unsafe_allow_html=True
     )
 
+    # Inicializa estado para subrayados y comentarios
     if "highlights" not in st.session_state:
         st.session_state["highlights"] = []
     if "comments" not in st.session_state:
         st.session_state["comments"] = []
 
-    st.write("### Document Viewer")
+    # Mostrar el documento con subrayados aplicados
+    st.write("### Documento")
     document_html = document_content
-    for highlight, comment in zip(st.session_state["highlights"], st.session_state["comments"]):
+    for highlight in st.session_state["highlights"]:
         document_html = document_html.replace(
             highlight, f'<span class="highlight">{highlight}</span>'
         )
     st.markdown(document_html, unsafe_allow_html=True)
 
-    st.text_input("Select text to highlight", key="selected_text")
-    if st.button("Highlight"):
-        if st.session_state.get("selected_text"):
-            st.session_state["highlights"].append(st.session_state["selected_text"])
-            st.session_state["comments"].append("")
-            st.experimental_rerun()
+    # Selección y subrayado de texto
+    selected_text = st.text_input("Texto seleccionado para resaltar:")
+    if st.button("Añadir subrayado"):
+        if selected_text and selected_text not in st.session_state["highlights"]:
+            st.session_state["highlights"].append(selected_text)
+            st.session_state["comments"].append("")  # Placeholder para comentario
+            st.success("Subrayado añadido correctamente.")
 
-    st.write("### Comments")
-    for i, comment in enumerate(st.session_state["comments"]):
-        st.text_area(f"Comment for: {st.session_state['highlights'][i]}", value=comment, key=f"comment_{i}")
+    # Mostrar comentarios asociados
+    st.write("### Comentarios")
+    for i, highlight in enumerate(st.session_state["highlights"]):
+        st.text_area(
+            f"Comentario para: {highlight}",
+            value=st.session_state["comments"][i],
+            key=f"comment_{i}",
+            on_change=update_comment,
+            args=(i,)
+        )
+
+
+def update_comment(index):
+    """
+    Actualiza un comentario específico basado en la posición del subrayado.
+    """
+    st.session_state["comments"][index] = st.session_state[f"comment_{index}"]
