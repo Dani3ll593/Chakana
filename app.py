@@ -74,15 +74,6 @@ if file:
         render_highlight_comment_section(st.session_state['document'])
     with col2:
         st.markdown("### Comentarios")
-        if "document" in st.session_state:
-    st.markdown("---")
-    st.subheader("🖍️ Subrayar y Añadir Comentarios")
-    st.write("Selecciona texto y añade comentarios para mejorar la revisión del documento.")
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        render_highlight_comment_section(st.session_state['document'])
-    with col2:
-        st.markdown("### Comentarios")
         if "comments" in st.session_state and st.session_state["comments"]:
             for i, comment in enumerate(st.session_state["comments"]):
                 st.markdown(
