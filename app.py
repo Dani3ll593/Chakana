@@ -28,6 +28,18 @@ st.markdown("""
     .stButton>button:hover {
         background-color: #45a049;
     }
+    .highlight {
+        background-color: yellow;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    .comment-box {
+        margin-top: 10px;
+        padding: 10px;
+        border-left: 2px solid blue;
+        background-color: #f9f9f9;
+        font-size: 14px;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -56,27 +68,32 @@ if file:
     
     # Visualización del documento
     st.subheader("📄 Visualización del Documento")
-    st.write("Aquí está el contenido de tu documento:")
-    st.write(document_content)
-
-# Sección: Subrayado y comentarios
-if "document" in st.session_state:
-    st.markdown("---")
-    st.subheader("🖍️ Subrayar y Añadir Comentarios")
-    st.write("Selecciona texto y añade comentarios para mejorar la revisión del documento.")
-    render_highlight_comment_section(st.session_state['document'])
+    st.markdown("Interactúa con el texto subrayando y añadiendo comentarios.")
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        render_highlight_comment_section(st.session_state['document'])
+    with col2:
+        st.markdown("### Comentarios")
+        if "comments" in st.session_state and st.session_state["comments"]:
+            for i, comment in enumerate(st.session_state["comments"]):
+                st.markdown(
+                    f'<div class="comment-box"><b>Texto Subrayado:</b> {st.session_state["highlights"][i]}<br><b>Comentario:</b> {comment}</div>',
+                    unsafe_allow_html=True,
+                )
+        else:
+            st.write("No hay comentarios aún. Selecciona texto en el documento para añadir comentarios.")
 
 # Sección: Análisis con IA
 if "document" in st.session_state:
     st.markdown("---")
     st.subheader("🧠 Análisis con Inteligencia Artificial")
-    st.write("Utiliza nuestra herramienta de análisis para evaluar la calidad y consistencia del texto seleccionado.")
+    st.write("Selecciona texto y utiliza el análisis asistido por IA para evaluar la calidad.")
     if st.button("🔍 Analizar Texto Seleccionado"):
         if "highlighted_text" in st.session_state:
             with st.spinner("🔄 Enviando texto al modelo de IA..."):
                 analysis_results = analyze_text(st.session_state['highlighted_text'])
                 st.success("✅ Análisis completado.")
-                st.write("**Resultados del Análisis:**")
+                st.markdown("**Resultados del Análisis:**")
                 st.write(analysis_results)
         else:
             st.warning("⚠️ No se ha seleccionado texto para analizar.")
