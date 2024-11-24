@@ -1,26 +1,33 @@
 import os
+from dotenv import load_dotenv
 import requests
 
-BASE_URL = os.getenv("AIML_BASE_URL")
+# Load environment variables
+load_dotenv()
+
+API_BASE_URL = os.getenv("AIML_BASE_URL", "https://api.aimlapi.com/v1")
 API_KEY = os.getenv("AIML_API_KEY")
 
-def analyze_text(text):
-    """Enviar texto a la API para análisis."""
-    url = f"{BASE_URL}/analyze"
-    headers = {"Authorization": f"Bearer {API_KEY}"}
-    payload = {"text": text}
+def get_model_feedback(text):
+    """
+    Sends text to the API and retrieves AI feedback.
+    """
+    headers = {
+        "Authorization": f"Bearer {API_KEY}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+        "messages": [
+            {"role": "system", "content": "You are an assistant for research writing analysis."},
+            {"role": "user", "content": text}
+        ],
+        "temperature": 0.7,
+        "max_tokens": 500
+    }
 
-    response = requests.post(url, json=payload, headers=headers)
+    response = requests.post(f"{API_BASE_URL}/chat/completions", json=payload, headers=headers)
     if response.status_code == 200:
-        return response.json()
+        return response.json()["choices"][0]["message"]["content"].split("\n")
     else:
-        raise Exception(f"Error en la API: {response.status_code} - {response.text}")
-
-def generate_report(sections):
-    """Generar un reporte basado en los resultados de análisis."""
-    observations = []
-    for section, content in sections.items():
-        result = analyze_text(content)
-        observations.append(f"Sección: {section}\nObservaciones:\n{result.get('suggestions', 'Sin observaciones.')}\n")
-
-    return "\n\n".join(observations)
+        raise Exception(f"API error: {response.status_code} - {response.text}")
