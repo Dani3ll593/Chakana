@@ -49,15 +49,16 @@ def _load_pdf(file):
 
 def process_document(content, structure):
     """
-    Procesa el contenido basado en la estructura.
-    Cada bloque es una sección del documento según el índice generado.
+    Procesa el contenido basado en la estructura proporcionada.
+    Divide el contenido en bloques según los encabezados en la estructura.
     """
-    sections = []
     if not structure:
-        return content.split("\n\n")  # Dividir por párrafos si no hay estructura
-
-    for key, section_title in structure.items():
-        sections.append(f"{section_title}\n\n")
+        # Si no hay estructura (por ejemplo, en archivos .txt simples), dividir por párrafos
+        return content.split("\n\n")
+    
+    sections = []
+    for key, title in structure.items():
+        sections.append(f"{title}\n{content}")
     return sections
 
 
