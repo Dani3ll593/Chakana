@@ -6,8 +6,11 @@ import os
 
 # Cargar estilos personalizados
 def load_styles():
-    with open("./static/styles.css", "r") as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    try:
+        with open("./static/styles.css", "r") as f:
+            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
+    except FileNotFoundError:
+        st.error("Error al cargar los estilos CSS.")
 
 # Configuración de la barra lateral
 def configure_sidebar():
@@ -26,8 +29,11 @@ def main():
         st.title("Carga de Documento")
         uploaded_file = st.file_uploader("Cargue un documento .docx", type="docx")
         if uploaded_file:
-            document_text = load_word_file(uploaded_file)
-            text_editor(document_text)
+            try:
+                document_text = load_word_file(uploaded_file)
+                text_editor(document_text)
+            except Exception as e:
+                st.error(f"Error al procesar el documento: {e}")
     elif option == "Analizar Documento":
         st.title("Análisis de Documento con IA")
         st.write("Seleccione texto en el editor para analizar.")
