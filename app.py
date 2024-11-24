@@ -2,7 +2,6 @@ import streamlit as st
 from utils.api_handler import get_model_feedback
 from utils.file_processor import extract_text
 import os
-import json
 
 # Streamlit setup
 st.set_page_config(page_title="Research Assistant", layout="wide")
@@ -24,29 +23,29 @@ if uploaded_file:
         # Process the document
         document_text, sections = extract_text(uploaded_file)
         st.success("Document successfully processed!")
-        
+
         # Layout with two columns
-        col1, col2 = st.columns([1, 1])
+        col1, col2 = st.columns([2, 1])
 
         # Left Column: Document display and section navigation
         with col1:
-            st.subheader("📄 Document Sections")
+            st.subheader("📄 Document Viewer")
             section_names = list(sections.keys())
             selected_section = st.radio("Select a section to analyze:", section_names)
 
-            if selected_section:
-                st.write(f"### {selected_section}")
-                st.write(sections[selected_section])
-
-                # Analyze section
-                if st.button("Analyze Selected Section"):
-                    with st.spinner("Analyzing the section with AI..."):
-                        feedback = get_model_feedback(sections[selected_section], writing_style=writing_style)
-                    st.success("Analysis complete!")
-                    
-                    # Save feedback as the default comment
-                    st.session_state.comments[selected_section] = feedback
-                    st.info("The AI feedback has been saved as the default comment.")
+            # Display the document with highlights for selected section
+            for section, content in sections.items():
+                if section == selected_section:
+                    st.markdown(
+                        f"<div style='background-color:#fdf5e6; padding:10px; border-left:5px solid #ffa500;'>"
+                        f"<strong>{section}</strong><br>{content}</div>",
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    st.markdown(
+                        f"<div style='padding:10px;'><strong>{section}</strong><br>{content}</div>",
+                        unsafe_allow_html=True,
+                    )
 
         # Right Column: Comments and feedback
         with col2:
@@ -55,27 +54,32 @@ if uploaded_file:
                 comment = st.text_area(
                     f"Comments for '{selected_section}':",
                     value=st.session_state.comments[selected_section],
-                    height=300,
+                    height=200,
+                )
+            else:
+                comment = st.text_area(
+                    f"Comments for '{selected_section}':",
+                    placeholder="Add your comment here...",
+                    height=200,
                 )
 
-                if st.button("Save Comment"):
-                    st.session_state.comments[selected_section] = comment
-                    st.success("Comment saved!")
+            if st.button("Save Comment", key=f"save_{selected_section}"):
+                st.session_state.comments[selected_section] = comment
+                st.success(f"Comment saved for section '{selected_section}'!")
 
             st.subheader("All Comments")
             for section, comment in st.session_state.comments.items():
-                st.markdown(f"**{section}**")
-                st.write(comment)
+                st.markdown(
+                    f"<div style='background-color:#f0f8ff; padding:10px; border-left:5px solid #4682b4;'>"
+                    f"<strong>{section}</strong><br>{comment}</div>",
+                    unsafe_allow_html=True,
+                )
 
         # Export Comments and Generate Review Report
         st.markdown("### 📤 Export Comments")
         if st.button("Generate Review Report"):
             try:
-                # Generate the review report
                 report_content = generate_review_report(sections, st.session_state.comments, writing_style)
-                st.success("Review report generated successfully!")
-                
-                # Provide a download button for the report
                 st.download_button(
                     label="Download Review Report",
                     data=report_content,
@@ -83,7 +87,6 @@ if uploaded_file:
                     mime="text/plain",
                 )
             except Exception as e:
-                # Handle errors during report generation
                 st.error(f"Error generating the review report: {e}")
 
     except Exception as e:
@@ -96,29 +99,17 @@ else:
 def generate_review_report(sections, comments, style):
     """
     Generates a structured review report using a predefined template.
-
-    Parameters:
-        - sections (dict): A dictionary where keys are section titles and values are the content.
-        - comments (dict): A dictionary where keys are section titles and values are comments.
-        - style (str): The selected writing style for evaluation.
-
-    Returns:
-        - str: The generated report as a single text string.
     """
-    # Start the report with metadata
     report_lines = []
     report_lines.append("# Research Review Report\n")
     report_lines.append(f"**Writing Style Evaluated:** {style}\n")
     report_lines.append(f"**Total Sections Analyzed:** {len(sections)}\n")
     report_lines.append("\n---\n")
 
-    # Add each section and its comments
     for section, content in sections.items():
         report_lines.append(f"## Section: {section}\n")
         report_lines.append(content)
         report_lines.append("\n")
-
-        # Include comments for the section
         if section in comments:
             report_lines.append("### Comments:\n")
             report_lines.append(comments[section])
@@ -126,7 +117,6 @@ def generate_review_report(sections, comments, style):
             report_lines.append("### Comments:\nNo comments provided.\n")
         report_lines.append("\n---\n")
 
-    # Conclude the report
     report_lines.append("# End of Report\n")
 
     return "\n".join(report_lines)
