@@ -66,7 +66,7 @@ def get_model_feedback(text, temperature=0.7, max_tokens=1000, criteria=None):
     try:
         response = requests.post(f"{API_BASE_URL}/chat/completions", headers=headers, data=json.dumps(payload))
         response.raise_for_status()
-        # Extract the feedback
+        # Extract the feedback as a single paragraph
         feedback = response.json()["choices"][0]["message"]["content"].strip()
         return feedback
     except requests.exceptions.HTTPError as http_err:
