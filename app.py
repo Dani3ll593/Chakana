@@ -15,6 +15,10 @@ if "comments" not in st.session_state:
 # File upload
 uploaded_file = st.file_uploader("Upload a document (.docx, .pdf, .txt)", type=["docx", "pdf", "txt"])
 
+# Writing style selection
+st.markdown("### Select Writing Style")
+writing_style = st.selectbox("Choose the style for evaluation:", ["APA", "Chicago", "Vancouver", "None"])
+
 if uploaded_file:
     try:
         # Process the document
@@ -37,7 +41,7 @@ if uploaded_file:
                 # Analyze section
                 if st.button("Analyze Selected Section"):
                     with st.spinner("Analyzing the section with AI..."):
-                        feedback = get_model_feedback(sections[selected_section])
+                        feedback = get_model_feedback(sections[selected_section], writing_style=writing_style)
                     st.success("Analysis complete!")
                     
                     # Save feedback as the default comment
@@ -66,7 +70,7 @@ if uploaded_file:
         # Export Comments
         st.markdown("### 📤 Export Comments")
         if st.button("Generate Review Report"):
-            report_content = generate_review_report(sections, st.session_state.comments)
+            report_content = generate_review_report(sections, st.session_state.comments, writing_style)
             st.download_button(
                 label="Download Review Report",
                 data=report_content,
@@ -80,12 +84,13 @@ else:
     st.info("Please upload a document to begin analysis.")
 
 # Generate Review Report
-def generate_review_report(sections, comments):
+def generate_review_report(sections, comments, style):
     """
     Generates a review report by combining document sections with their corresponding comments.
     """
     report_lines = []
     report_lines.append("### Review Report\n")
+    report_lines.append(f"**Writing Style Evaluated:** {style}\n")
     report_lines.append("\n")
 
     for section, content in sections.items():
