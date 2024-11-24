@@ -1,3 +1,19 @@
+import os
+from dotenv import load_dotenv
+import requests
+import json
+
+# Load environment variables
+load_dotenv()
+
+API_BASE_URL = os.getenv("AIML_BASE_URL")
+API_KEY = os.getenv("AIML_API_KEY")
+
+# Debugging environment variables
+if not API_BASE_URL or not API_KEY:
+    print("DEBUG: API_BASE_URL or API_KEY is missing.")
+    raise ValueError("API_BASE_URL or API_KEY is missing. Ensure .env is set up correctly.")
+
 def get_model_feedback(text, temperature=0.7, max_tokens=1000, criteria=None):
     """
     Sends text to the AI/ML API and retrieves AI feedback as a single paragraph.
