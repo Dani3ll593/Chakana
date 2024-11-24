@@ -69,17 +69,22 @@ if uploaded_file:
 
         # Export Comments
         st.markdown("### 📤 Export Comments")
-        if st.button("Generate Review Report"):
-            report_content = generate_review_report(sections, st.session_state.comments, writing_style)
-            st.download_button(
-                label="Download Review Report",
-                data=report_content,
-                file_name="review_report.txt",
-                mime="text/plain",
-            )
-
+if st.button("Generate Review Report"):
+    try:
+        # Generate the review report
+        report_content = generate_review_report(sections, st.session_state.comments, writing_style)
+        st.success("Review report generated successfully!")
+        
+        # Provide a download button for the report
+        st.download_button(
+            label="Download Review Report",
+            data=report_content,
+            file_name="review_report.txt",
+            mime="text/plain",
+        )
     except Exception as e:
-        st.error(f"Error processing the document: {e}")
+        st.error(f"Error generating the review report: {e}")
+
 else:
     st.info("Please upload a document to begin analysis.")
 
@@ -103,5 +108,43 @@ def generate_review_report(sections, comments, style):
         else:
             report_lines.append("**Comments:** None provided.\n")
         report_lines.append("\n---\n")
+
+    return "\n".join(report_lines)
+
+def generate_review_report(sections, comments, style):
+    """
+    Generates a structured review report using a predefined template.
+
+    Parameters:
+        - sections (dict): A dictionary where keys are section titles and values are the content.
+        - comments (dict): A dictionary where keys are section titles and values are comments.
+        - style (str): The selected writing style for evaluation.
+
+    Returns:
+        - str: The generated report as a single text string.
+    """
+    # Start the report with metadata
+    report_lines = []
+    report_lines.append("# Research Review Report\n")
+    report_lines.append(f"**Writing Style Evaluated:** {style}\n")
+    report_lines.append(f"**Total Sections Analyzed:** {len(sections)}\n")
+    report_lines.append("\n---\n")
+
+    # Add each section and its comments
+    for section, content in sections.items():
+        report_lines.append(f"## Section: {section}\n")
+        report_lines.append(content)
+        report_lines.append("\n")
+
+        # Include comments for the section
+        if section in comments:
+            report_lines.append("### Comments:\n")
+            report_lines.append(comments[section])
+        else:
+            report_lines.append("### Comments:\nNo comments provided.\n")
+        report_lines.append("\n---\n")
+
+    # Conclude the report
+    report_lines.append("# End of Report\n")
 
     return "\n".join(report_lines)
