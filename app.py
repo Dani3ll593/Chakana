@@ -66,51 +66,33 @@ if uploaded_file:
             for section, comment in st.session_state.comments.items():
                 st.markdown(f"**{section}**")
                 st.write(comment)
-# Export Comments and Generate Review Report
-st.markdown("### 📤 Export Comments")
-if st.button("Generate Review Report"):
-    try:
-        # Generate the review report
-        report_content = generate_review_report(sections, st.session_state.comments, writing_style)
-        st.success("Review report generated successfully!")
-        
-        # Provide a download button for the report
-        st.download_button(
-            label="Download Review Report",
-            data=report_content,
-            file_name="review_report.txt",
-            mime="text/plain",
-        )
-    except Exception as e:
-        # Handle errors during report generation
-        st.error(f"Error generating the review report: {e}")
 
+        # Export Comments and Generate Review Report
+        st.markdown("### 📤 Export Comments")
+        if st.button("Generate Review Report"):
+            try:
+                # Generate the review report
+                report_content = generate_review_report(sections, st.session_state.comments, writing_style)
+                st.success("Review report generated successfully!")
+                
+                # Provide a download button for the report
+                st.download_button(
+                    label="Download Review Report",
+                    data=report_content,
+                    file_name="review_report.txt",
+                    mime="text/plain",
+                )
+            except Exception as e:
+                # Handle errors during report generation
+                st.error(f"Error generating the review report: {e}")
+
+    except Exception as e:
+        st.error(f"Error processing the document: {e}")
 else:
     st.info("Please upload a document to begin analysis.")
 
-# Generate Review Report
-def generate_review_report(sections, comments, style):
-    """
-    Generates a review report by combining document sections with their corresponding comments.
-    """
-    report_lines = []
-    report_lines.append("### Review Report\n")
-    report_lines.append(f"**Writing Style Evaluated:** {style}\n")
-    report_lines.append("\n")
 
-    for section, content in sections.items():
-        report_lines.append(f"#### {section}\n")
-        report_lines.append(content)
-        report_lines.append("\n")
-        if section in comments:
-            report_lines.append("**Comments:**\n")
-            report_lines.append(comments[section])
-        else:
-            report_lines.append("**Comments:** None provided.\n")
-        report_lines.append("\n---\n")
-
-    return "\n".join(report_lines)
-
+# Generate Review Report Function
 def generate_review_report(sections, comments, style):
     """
     Generates a structured review report using a predefined template.
