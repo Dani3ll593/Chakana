@@ -1,8 +1,7 @@
 import streamlit as st
 from components.text_editor import text_editor
-from components.context_menu import context_menu
 from utils.file_handler import load_word_file
-import os
+from utils.comment_manager import load_comments
 
 # Cargar estilos personalizados
 def load_styles():
@@ -10,17 +9,27 @@ def load_styles():
         with open("./static/styles.css", "r") as f:
             st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
     except FileNotFoundError:
-        st.error("Error al cargar los estilos CSS.")
+        st.error("Error al cargar estilos CSS.")
 
-# Configuración de la barra lateral
+# Configuración de barra lateral y panel de comentarios
 def configure_sidebar():
     st.sidebar.title("Opciones")
     return st.sidebar.radio("Seleccione una opción", ["Inicio", "Carga de Documento", "Analizar Documento"])
 
-# Inicio de la app
+def render_comments_panel():
+    comments = load_comments()
+    st.sidebar.title("Comentarios")
+    for comment in comments:
+        st.sidebar.markdown(f"**Usuario:** {comment['user']}")
+        st.sidebar.markdown(f"**Fecha:** {comment['timestamp']}")
+        st.sidebar.markdown(f"**Texto:** {comment['text']}")
+        st.sidebar.markdown(f"> {comment['comment']}")
+
+# Inicio de la aplicación
 def main():
     load_styles()
     option = configure_sidebar()
+    render_comments_panel()
 
     if option == "Inicio":
         st.title("Procesador de Documentos con IA")

@@ -1,11 +1,16 @@
 import streamlit as st
 from components.context_menu import context_menu
 
-# Editor de texto con funcionalidades básicas
+# Editor de texto con menú contextual
 def text_editor(text):
     if "text" not in st.session_state:
         st.session_state["text"] = text
-    
-    st.session_state["text"] = st.text_area("Editor de texto", st.session_state["text"], height=400, key="editor")
-    st.write("Seleccione texto y utilice las opciones del menú contextual para añadir comentarios o analizar.")
-    context_menu()
+
+    col1, col2 = st.columns([3, 1])
+    with col1:
+        st.session_state["text"] = st.text_area("Editor de texto", st.session_state["text"], height=400, key="editor")
+        context_menu()
+    with col2:
+        st.markdown("### Opciones")
+        st.button("Añadir Comentario")
+        st.button("Analizar Selección")
