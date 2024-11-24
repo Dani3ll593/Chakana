@@ -1,72 +1,36 @@
 import streamlit as st
-from components.document_loader import load_document
-from components.highlight_comments import render_highlight_comment_section
-from components.ai_analysis import analyze_text
-from components.persistence import save_annotations, export_document
+from components.text_editor import text_editor
+from components.context_menu import context_menu
+from utils.file_handler import load_word_file
+import os
 
-# Configuración general de la aplicación
-st.set_page_config(
-    layout="wide",
-    page_title="📄 Document Review App",
-    page_icon="📚"
-)
+# Cargar estilos personalizados
+def load_styles():
+    with open("./static/styles.css", "r") as f:
+        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# Estilo inicial
-st.markdown("""
-<style>
-    .main-container {
-        padding-top: 20px;
-    }
-    .sidebar .stButton>button {
-        color: white;
-        background-color: #4CAF50; /* Green */
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        padding: 10px;
-    }
-    .stButton>button:hover {
-        background-color: #45a049;
-    }
-</style>
-""", unsafe_allow_html=True)
+# Configuración de la barra lateral
+def configure_sidebar():
+    st.sidebar.title("Opciones")
+    return st.sidebar.radio("Seleccione una opción", ["Inicio", "Carga de Documento", "Analizar Documento"])
 
-# Título principal
-st.title("📚 Document Review App")
-st.markdown("Simplifica la revisión de documentos con herramientas de **anotación, comentarios** y análisis asistido por **IA**.")
+# Inicio de la app
+def main():
+    load_styles()
+    option = configure_sidebar()
 
-# Sección: Cargar y visualizar documentos
-with st.sidebar:
-    st.header("📂 Cargar Documento")
-    file = st.file_uploader(
-        "Sube un archivo Word (.docx) o PDF (.pdf):",
-        type=["docx", "pdf"],
-        help="Selecciona un documento para empezar."
-    )
-    st.markdown("---")
-    st.header("⚙️ Acciones")
+    if option == "Inicio":
+        st.title("Procesador de Documentos con IA")
+        st.write("Cargue documentos, resalte texto y utilice IA para análisis avanzado.")
+    elif option == "Carga de Documento":
+        st.title("Carga de Documento")
+        uploaded_file = st.file_uploader("Cargue un documento .docx", type="docx")
+        if uploaded_file:
+            document_text = load_word_file(uploaded_file)
+            text_editor(document_text)
+    elif option == "Analizar Documento":
+        st.title("Análisis de Documento con IA")
+        st.write("Seleccione texto en el editor para analizar.")
 
-if file:
-    # Cargar documento
-    with st.spinner("📥 Procesando documento..."):
-        document_content, file_type = load_document(file)
-        st.session_state['document'] = document_content
-        st.session_state['file_type'] = file_type
-        st.success("✅ Documento cargado exitosamente.")
-    
-    # Visualización del documento con funcionalidad interactiva
-    st.subheader("📄 Visualización del Documento")
-    st.markdown("Interactúa con el texto subrayando y añadiendo comentarios.")
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        render_highlight_comment_section(st.session_state['document'])
-    with col2:
-        st.markdown("### Comentarios")
-        if "comments" in st.session_state and st.session_state["comments"]:
-            for i, comment in enumerate(st.session_state["comments"]):
-                st.markdown(
-                    f'<div class="comment-box"><b>Texto Subrayado:</b> {st.session_state["highlights"][i]}<br><b>Comentario:</b> {comment}</div>',
-                    unsafe_allow_html=True,
-                )
-        else:
-            st.write("No hay comentarios aún. Selecciona texto en el documento para añadir comentarios.")
+if __name__ == "__main__":
+    main()
