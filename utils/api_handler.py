@@ -5,8 +5,8 @@ import requests
 # Load environment variables
 load_dotenv()
 
-API_BASE_URL = os.getenv("AIML_BASE_URL", "https://api.aimlapi.com/v1")
-API_KEY = os.getenv("AIML_API_KEY")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://api.aimlapi.com/v1")
+API_KEY = os.getenv("API_KEY")
 
 
 def get_model_feedback(text):
