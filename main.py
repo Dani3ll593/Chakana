@@ -1,83 +1,47 @@
-import openai
-from dotenv import load_dotenv
-import os
 import streamlit as st
-import pandas as pd
-from PyPDF2 import PdfReader
-import docx
+from utils.file_handler import load_document, process_document
+from utils.comment_manager import CommentManager
 
+# Inicializar gestor de comentarios
+comment_manager = CommentManager()
 
-# Cargar configuraciones del entorno
-def analyze_text_with_api(text):
-    system_prompt = "Eres un asistente experto en análisis textual. Analiza el texto a nivel de coherencia interna y externa."
-    user_prompt = f"Texto para analizar:\n{text}"
-    
-    try:
-        response = openai.ChatCompletion.acreate(
-            model="meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": user_prompt},
-            ],
-            temperature=0.7,
-            max_tokens=1000,
-        )
-        return response["choices"][0]["message"]["content"]
-    except openai.OpenAIError as e:
-        return f"Error al procesar la solicitud: {e}"
+st.set_page_config(layout="wide")
+st.title("Gestor de Documentos")
 
-
-
-# Función para leer archivos .docx
-def read_docx(file):
-    doc = docx.Document(file)
-    return "\n".join([paragraph.text for paragraph in doc.paragraphs])
-
-# Función para leer archivos PDF
-def read_pdf(file):
-    pdf_reader = PdfReader(file)
-    return "\n".join([page.extract_text() for page in pdf_reader.pages])
-
-# Función para cargar y procesar archivos
-def process_uploaded_file(uploaded_file):
-    file_type = uploaded_file.name.split('.')[-1]
-
-    if file_type == "docx":
-        return read_docx(uploaded_file)
-    elif file_type == "pdf":
-        return read_pdf(uploaded_file)
-    elif file_type == "xlsx":
-        return pd.read_excel(uploaded_file)
-    elif file_type == "csv":
-        return pd.read_csv(uploaded_file)
-    else:
-        return "Formato no soportado. Por favor sube un archivo .docx, .pdf, .xlsx o .csv."
-
-
-
-# Configuración de la aplicación en Streamlit
-st.title("Análisis de Documentos con Llama")
-
-# Subida de archivos
-uploaded_file = st.file_uploader("Sube un archivo para análisis (.docx, .pdf, .xlsx, .csv)", type=["docx", "pdf", "xlsx", "csv"])
-
+# Carga del documento
+uploaded_file = st.file_uploader("Cargar documento (.docx, .pdf, .txt)", type=["docx", "pdf", "txt"])
 if uploaded_file:
-    file_type = uploaded_file.name.split('.')[-1]
+    try:
+        # Cargar y procesar documento
+        content = load_document(uploaded_file)
+        sections = process_document(content)
+        
+        # Interfaz de usuario
+        col1, col2 = st.columns([3, 2])
+        with col1:
+            st.subheader("Visualización del Documento")
+            for i, section in enumerate(sections):
+                if st.button(f"Seleccionar Sección {i + 1}", key=f"section_{i}"):
+                    comment_manager.set_active_section(i)
+                st.write(section)
 
-    # Procesar el archivo subido
-    if file_type in ["docx", "pdf"]:
-        text_content = process_uploaded_file(uploaded_file)
-        st.write("Texto extraído:")
-        st.text_area("Vista previa", text_content, height=300)
+        with col2:
+            st.subheader("Panel de Comentarios")
+            active_section = comment_manager.get_active_section()
+            if active_section is not None:
+                comment_text = st.text_area("Agregar comentario", key=f"comment_{active_section}")
+                if st.button("Guardar comentario", key="save_comment"):
+                    comment_manager.add_comment(active_section, comment_text)
+            st.write("Comentarios:")
+            for idx, (section, comment) in enumerate(comment_manager.get_comments().items()):
+                st.write(f"Sección {section + 1}: {comment}")
+                if st.button("Eliminar", key=f"delete_{idx}"):
+                    comment_manager.delete_comment(section)
+        
+        # Exportar documento con comentarios
+        if st.button("Exportar Documento"):
+            output_path = comment_manager.export_with_comments(uploaded_file.name, content, sections)
+            st.success(f"Documento exportado: {output_path}")
 
-        # Enviar texto a la API
-        if st.button("Analizar con Llama"):
-            result = analyze_text_with_api(text_content)
-            st.write("Resultado del Análisis:")
-            st.text_area("Análisis", result, height=300)
-    elif file_type in ["xlsx", "csv"]:
-        data_content = process_uploaded_file(uploaded_file)
-        st.write("Vista previa de los datos:")
-        st.dataframe(data_content)
-    else:
-        st.error("Formato no soportado.")
+    except Exception as e:
+        st.error(f"Error al procesar el documento: {e}")
