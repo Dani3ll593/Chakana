@@ -1,9 +1,9 @@
 import requests
-import re
 import logging
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
 import json
+
 
 class AIMLClient:
     def __init__(self, api_url, api_key):
@@ -57,48 +57,13 @@ class AIMLClient:
         return self._make_request(endpoint, payload)
 
     def analyze_sentiment(self, text):
+        if not text or not isinstance(text, str) or len(text.strip()) == 0:
+            raise ValueError("El texto proporcionado es inválido o está vacío.")
         endpoint = f"{self.api_url}/sentiment"
         payload = {
             "text": text,
             "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
             "max_tokens": 500
         }
+        logging.info(f"Enviando payload a {endpoint}: {payload}")
         return self._make_request(endpoint, payload)
-
-    def analyze_academic_quality(self, text):
-        sections = self.split_into_sections(text)
-        results = []
-        for section in sections:
-            section_text = section["content"].strip()
-            if section_text:
-                try:
-                    analysis_result = self.analyze_text(section_text)
-                    results.append({
-                        "section_title": section["title"],
-                        "analysis": analysis_result
-                    })
-                except ValueError as e:
-                    results.append({
-                        "section_title": section["title"],
-                        "error": str(e)
-                    })
-        return results
-
-    def split_into_sections(self, text):
-        sections = []
-        current_section = {"title": None, "content": ""}
-        lines = text.splitlines()
-
-        for line in lines:
-            line = line.strip()
-            if re.match(r"^[A-Z\s]+$", line):
-                if current_section["title"]:
-                    sections.append(current_section)
-                current_section = {"title": line, "content": ""}
-            elif line:
-                current_section["content"] += line + " "
-
-        if current_section["title"]:
-            sections.append(current_section)
-
-        return sections
