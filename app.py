@@ -70,7 +70,7 @@ uploaded_file = st.sidebar.file_uploader("📤 Cargar documento", type=["txt", "
 
 col1, col2 = st.columns([1, 1])
 
-def export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, wordcloud_image, file_name="reporte_analisis.pdf"):
+def export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, file_name="reporte_analisis.pdf"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
@@ -85,9 +85,6 @@ def export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, wor
     pdf.multi_cell(0, 10, summary_paragraph_1)
     pdf.ln(10)
     pdf.multi_cell(0, 10, summary_paragraph_2)
-    pdf.ln(10)
-    pdf.multi_cell(0, 10, "Nube de Palabras:")
-    pdf.image(wordcloud_image, x=10, y=None, w=190)
     pdf.output(file_name)
     return file_name
 
@@ -182,9 +179,9 @@ elif 'text' in locals() and text.strip():
         st.error(f"Error al generar la nube de palabras: {e}")
 
 if st.button("📄 Exportar reporte"):
-    if 'analysis_result' in locals() and 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals() and 'wordcloud_image' in locals():
+    if 'analysis_result' in locals() and 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals():
         try:
-            report_file = export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, wordcloud_image)
+            report_file = export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, "wordcloud.png")
             st.success(f"Reporte exportado exitosamente: {report_file}")
             with open(report_file, "rb") as file:
                 btn = st.download_button(
