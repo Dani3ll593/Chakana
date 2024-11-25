@@ -1,51 +1,68 @@
+import os
 import streamlit as st
-from components.text_editor import text_editor
-from utils.file_handler import load_word_file
-from utils.comment_manager import load_comments
+from dotenv import load_dotenv
+from utils.aiml_client import AIMLClient
+from utils.file_utils import load_file, save_file, extract_text
+from utils.text_analysis import analyze_text, summarize_text, generate_wordcloud
 
-# Cargar estilos personalizados
-def load_styles():
-    try:
-        with open("./static/styles.css", "r") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    except FileNotFoundError:
-        st.error("Error al cargar estilos CSS.")
+# Cargar variables de entorno
+load_dotenv()
+API_URL = os.getenv("AIML_BASE_URL")
+API_KEY = os.getenv("AIML_API_KEY")
 
-# Configuración de barra lateral y panel de comentarios
-def configure_sidebar():
-    st.sidebar.title("Opciones")
-    return st.sidebar.radio("Seleccione una opción", ["Inicio", "Carga de Documento", "Analizar Documento"])
+# Inicialización del cliente IA
+client = AIMLClient(api_url=API_URL, api_key=API_KEY)
 
-def render_comments_panel():
-    comments = load_comments()
-    st.sidebar.title("Comentarios")
-    for comment in comments:
-        st.sidebar.markdown(f"**Usuario:** {comment['user']}")
-        st.sidebar.markdown(f"**Fecha:** {comment['timestamp']}")
-        st.sidebar.markdown(f"**Texto:** {comment['text']}")
-        st.sidebar.markdown(f"> {comment['comment']}")
+# Configuración de la página de Streamlit
+st.set_page_config(page_title="Procesador de Documentos Inteligente", layout="wide")
 
-# Inicio de la aplicación
-def main():
-    load_styles()
-    option = configure_sidebar()
-    render_comments_panel()
+# Cabecera
+st.title("📄 Procesador de Documentos Inteligente")
 
-    if option == "Inicio":
-        st.title("Procesador de Documentos con IA")
-        st.write("Cargue documentos, resalte texto y utilice IA para análisis avanzado.")
-    elif option == "Carga de Documento":
-        st.title("Carga de Documento")
-        uploaded_file = st.file_uploader("Cargue un documento .docx", type="docx")
-        if uploaded_file:
-            try:
-                document_text = load_word_file(uploaded_file)
-                text_editor(document_text)
-            except Exception as e:
-                st.error(f"Error al procesar el documento: {e}")
-    elif option == "Analizar Documento":
-        st.title("Análisis de Documento con IA")
-        st.write("Seleccione texto en el editor para analizar.")
+# Barra lateral para cargar archivos
+st.sidebar.header("Carga y Configuración")
+uploaded_file = st.sidebar.file_uploader("Carga un documento (.txt, .pdf, .docx):", type=["txt", "pdf", "docx"])
+action = st.sidebar.radio("Acción", ["Visualizar", "Analizar", "Resumir"])
 
-if __name__ == "__main__":
-    main()
+# Procesamiento del archivo
+if uploaded_file:
+    with st.spinner("Cargando documento..."):
+        text = extract_text(uploaded_file)
+        st.success("Documento cargado con éxito.")
+        st.write(f"### Contenido del documento ({len(text.split())} palabras):")
+        st.text_area("Texto", text, height=300)
+
+    if action == "Analizar":
+        st.subheader("Análisis del texto")
+        with st.spinner("Analizando texto..."):
+            analysis_results = analyze_text(text)
+            st.json(analysis_results)
+
+    elif action == "Resumir":
+        st.subheader("Resumen del texto")
+        with st.spinner("Resumiendo texto..."):
+            summary = summarize_text(client, text)
+            st.write(f"### Resumen:")
+            st.markdown(summary)
+
+# Widgets para edición de texto
+st.sidebar.header("Herramientas Interactivas")
+if "text" in locals():
+    new_text = st.sidebar.text_area("Edita el texto:", text)
+    if st.sidebar.button("Guardar texto modificado"):
+        save_file(new_text, "edited_text.txt")
+        st.sidebar.success("Texto modificado guardado.")
+
+# Nube de palabras
+if st.sidebar.checkbox("Generar Nube de Palabras"):
+    st.subheader("Nube de Palabras")
+    with st.spinner("Generando nube..."):
+        wordcloud_fig = generate_wordcloud(text)
+        st.pyplot(wordcloud_fig)
+
+# Opciones para exportar
+if st.sidebar.button("Exportar texto a archivo"):
+    file_path = save_file(text, "output_text.txt")
+    st.sidebar.download_button("Descargar Texto Exportado", data=open(file_path, "rb"), file_name="output_text.txt")
+
+st.sidebar.markdown("**Hecho con ❤️ por Streamlit**")
