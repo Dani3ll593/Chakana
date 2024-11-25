@@ -98,6 +98,7 @@ def generate_wordcloud(text):
         plt.figure(figsize=(10, 5))
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis("off")
+        plt.tight_layout()  # Asegurar que el layout esté ajustado
         return plt
     except Exception as e:
         logging.error(f"Error al generar la nube de palabras: {e}")
