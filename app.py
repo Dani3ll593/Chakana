@@ -84,30 +84,37 @@ def export_report(summary_paragraph_1, summary_paragraph_2, file_name="reporte_a
     pdf.output(file_name)
     return file_name
 
+def perform_analysis(text):
+    try:
+        analysis_result = analyze_text(text)
+        academic_quality_result = client.analyze_academic_quality(text)
+        logging.info(f"Academic Quality Result: {academic_quality_result}")
+        if academic_quality_result and 'analysis' in academic_quality_result[0]:
+            summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+            summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+            return analysis_result, summary_paragraph_1, summary_paragraph_2
+        else:
+            raise ValueError("No se pudo generar el análisis de calidad académica.")
+    except Exception as e:
+        st.error(f"Error al analizar el texto: {e}")
+        return None, None, None
+
 with col1:
     st.subheader("Texto para Análisis")
     pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200, key="pasted_text")
 
     if st.button("🔍 Analizar texto pegado"):
         if pasted_text.strip():
-            try:
-                with st.spinner("Analizando texto..."):
-                    analysis_result = analyze_text(pasted_text)
-                    st.json(analysis_result)
-                    academic_quality_result = client.analyze_academic_quality(pasted_text)
-                    logging.info(f"Academic Quality Result: {academic_quality_result}")  # Agregar log para la respuesta de calidad académica
-                    if academic_quality_result and 'analysis' in academic_quality_result[0]:
-                        # Generar dos párrafos de resumen basados en el análisis del modelo
-                        summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-                        summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+            with st.spinner("Analizando texto..."):
+                analysis_result, summary_paragraph_1, summary_paragraph_2 = perform_analysis(pasted_text)
+                if analysis_result:
+                    with col2:
+                        st.subheader("Resultados del Análisis")
+                        st.json(analysis_result)
                         st.markdown("### Resumen del Análisis")
                         st.write(summary_paragraph_1)
                         st.write(summary_paragraph_2)
                         st.pyplot(generate_wordcloud(pasted_text))
-                    else:
-                        st.warning("No se pudo generar el análisis de calidad académica.")
-            except Exception as e:
-                st.error(f"Error al analizar el texto: {e}")
         else:
             st.warning("Por favor, ingrese texto para analizar.")
 
@@ -115,40 +122,24 @@ with col1:
         if uploaded_file.size > 50 * 1024 * 1024:
             st.error("El archivo supera el límite de tamaño de 50 MB. Por favor, sube un archivo más pequeño.")
         else:
-            try:
-                with st.spinner("Procesando archivo..."):
+            with st.spinner("Procesando archivo..."):
+                try:
                     text = extract_text(uploaded_file)
                     st.success("Documento cargado con éxito.")
                     st.text_area("Texto del documento", text, height=300, key="uploaded_text")
 
                     if st.button("🔍 Analizar archivo"):
-                        analysis_result = analyze_text(text)
-                        st.json(analysis_result)
-                        academic_quality_result = client.analyze_academic_quality(text)
-                        logging.info(f"Academic Quality Result: {academic_quality_result}")  # Agregar log para la respuesta de calidad académica
-                        if academic_quality_result and 'analysis' in academic_quality_result[0]:
-                            # Generar dos párrafos de resumen basados en el análisis del modelo
-                            summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-                            summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
-                            st.markdown("### Resumen del Análisis")
-                            st.write(summary_paragraph_1)
-                            st.write(summary_paragraph_2)
-                            st.pyplot(generate_wordcloud(text))
-                        else:
-                            st.warning("No se pudo generar el análisis de calidad académica.")
-            except Exception as e:
-                st.error(f"Error al procesar el archivo: {e}")
-
-with col2:
-    st.subheader("Resultados del Análisis")
-    if 'analysis_result' in locals():
-        st.json(analysis_result)
-    if 'academic_quality_result' in locals() and academic_quality_result and 'analysis' in academic_quality_result[0]:
-        summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-        summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
-        st.markdown("### Resumen del Análisis")
-        st.write(summary_paragraph_1)
-        st.write(summary_paragraph_2)
+                        analysis_result, summary_paragraph_1, summary_paragraph_2 = perform_analysis(text)
+                        if analysis_result:
+                            with col2:
+                                st.subheader("Resultados del Análisis")
+                                st.json(analysis_result)
+                                st.markdown("### Resumen del Análisis")
+                                st.write(summary_paragraph_1)
+                                st.write(summary_paragraph_2)
+                                st.pyplot(generate_wordcloud(text))
+                except Exception as e:
+                    st.error(f"Error al procesar el archivo: {e}")
 
 if st.button("📄 Exportar reporte"):
     if 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals():

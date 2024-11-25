@@ -23,6 +23,10 @@ class AIMLClient:
             "text": text,
             "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Asegurar el uso del modelo especificado
             "max_tokens": 200,  # Permitir hasta 200 tokens
+            "temperature": 0.7,  # Asegurar que la temperatura sea 0.7
+            "top_p": 0.9,  # Ajustar top_p para mayor creatividad
+            "frequency_penalty": 0.5,  # Penalizar la frecuencia para evitar repeticiones
+            "presence_penalty": 0.6,  # Penalizar la presencia para fomentar la diversidad
             "prompt": (
                 "Por favor, realiza una revisión de la calidad académica del siguiente texto. "
                 "Evalúa los siguientes aspectos: "
