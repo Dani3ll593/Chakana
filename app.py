@@ -99,9 +99,13 @@ def perform_analysis(text):
             return analysis_result, summary_paragraph_1, summary_paragraph_2
         else:
             raise ValueError("No se pudo generar el análisis de calidad académica.")
-    except Exception as e:
+    except ValueError as e:
         logging.error(f"Error al analizar el texto: {e}")
         st.error(f"Error al analizar el texto: {e}")
+        return None, None, None
+    except Exception as e:
+        logging.error(f"Error inesperado: {e}")
+        st.error(f"Error inesperado: {e}")
         return None, None, None
 
 with col1:
