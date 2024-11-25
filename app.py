@@ -143,11 +143,10 @@ with col1:
                 if analysis_result:
                     with col2:
                         st.subheader("Resultados del Análisis")
-                        st.json(analysis_result)
-                        st.markdown("### Resumen del Análisis")
-                        st.write(summary_paragraph_1)
-                        st.write(summary_paragraph_2)
-                        st.write(summary_paragraph_3)
+                        st.markdown("### Análisis de texto")
+                        st.text_area("Análisis de texto", str(analysis_result), height=200)
+                        st.markdown("### Análisis de IA")
+                        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200)
                         try:
                             wordcloud_image = generate_wordcloud(pasted_text)
                             st.pyplot(wordcloud_image)
@@ -173,11 +172,10 @@ with col1:
                         if analysis_result:
                             with col2:
                                 st.subheader("Resultados del Análisis")
-                                st.json(analysis_result)
-                                st.markdown("### Resumen del Análisis")
-                                st.write(summary_paragraph_1)
-                                st.write(summary_paragraph_2)
-                                st.write(summary_paragraph_3)
+                                st.markdown("### Análisis de texto")
+                                st.text_area("Análisis de texto", str(analysis_result), height=200)
+                                st.markdown("### Análisis de IA")
+                                st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200)
                                 try:
                                     wordcloud_image = generate_wordcloud(text)
                                     st.pyplot(wordcloud_image)
@@ -189,12 +187,11 @@ with col1:
 with col2:
     st.subheader("Resultados del Análisis")
     if 'analysis_result' in locals():
-        st.json(analysis_result)
+        st.markdown("### Análisis de texto")
+        st.text_area("Análisis de texto", str(analysis_result), height=200)
     if 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals() and 'summary_paragraph_3' in locals():
-        st.markdown("### Resumen del Análisis")
-        st.write(summary_paragraph_1)
-        st.write(summary_paragraph_2)
-        st.write(summary_paragraph_3)
+        st.markdown("### Análisis de IA")
+        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200)
 
 st.markdown("---")
 st.subheader("Términos más destacados")
