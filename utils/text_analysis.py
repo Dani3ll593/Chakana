@@ -74,8 +74,12 @@ def analyze_text(text):
 
 def generate_wordcloud(text):
     try:
+        if not text:
+            raise ValueError("El texto proporcionado está vacío.")
         words = word_tokenize(text.lower())
         filtered_words = [word for word in words if word not in STOPWORDS]
+        if not filtered_words:
+            raise ValueError("No se encontraron palabras válidas para generar la nube de palabras.")
         wordcloud_text = " ".join(filtered_words)
         wordcloud = WordCloud(width=800, height=400, background_color="white").generate(wordcloud_text)
         plt.figure(figsize=(10, 5))
