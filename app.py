@@ -5,7 +5,7 @@ import logging
 from fpdf import FPDF
 
 try:
-    from utils.aiml_client import AIMLClient
+    from utils.aiml_client import AIMLClient2 as AIMLClient
     from utils.file_utils import extract_text
     from utils.text_analysis import analyze_text, generate_wordcloud
 except ImportError as e:
@@ -13,8 +13,8 @@ except ImportError as e:
     raise
 
 load_dotenv()
-API_URL = "https://api.aimlapi.com/v1"
-API_KEY = "176f8cfc88294a3fbb13111fd6ea568d"
+API_URL = os.getenv("AIML_BASE_URL")
+API_KEY = os.getenv("AIML_API_KEY")
 
 if not API_URL or not API_KEY:
     st.error("Faltan configuraciones en el archivo .env para la API.")

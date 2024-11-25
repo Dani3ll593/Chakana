@@ -11,7 +11,6 @@ import logging
 import nltk
 try:
     nltk.download('punkt', quiet=True)
-    nltk.download('punkt_tab', quiet=True)  # Añadir esta línea
 except Exception as e:
     raise RuntimeError(f"Error al inicializar recursos NLTK: {e}")
 
