@@ -73,14 +73,14 @@ class AIMLClient2:
                         "section_title": section["title"],
                         "error": str(e)
                     })
-        if results and 'analysis' in results[0]:
-            summary_paragraph_1 = results[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-            summary_paragraph_2 = results[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+        if results:
+            summary_paragraph_1 = results[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.") if 'analysis' in results[0] else "Error en la generación del análisis."
+            summary_paragraph_2 = results[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.") if 'analysis' in results[0] else "Consulta los logs para más detalles."
             summary_paragraph_3 = (
                 f"Análisis de sentimiento: {results[0]['analysis']['Análisis de sentimiento']}\n"
                 f"Legibilidad: {results[0]['analysis']['Legibilidad']}\n"
                 f"Diversidad léxica: {results[0]['analysis']['Diversidad léxica']}"
-            )
+            ) if 'analysis' in results[0] else ""
             return results, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3
         else:
             summary_paragraph_1 = "Error en la generación del análisis."
