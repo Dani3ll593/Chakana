@@ -88,6 +88,7 @@ with col1:
                         st.markdown("### Resumen del Análisis")
                         st.write(summary_paragraph_1)
                         st.write(summary_paragraph_2)
+                        st.pyplot(generate_wordcloud(pasted_text))
                     else:
                         st.warning("No se pudo generar el análisis de calidad académica.")
             except Exception as e:
@@ -133,3 +134,4 @@ with col2:
         st.markdown("### Resumen del Análisis")
         st.write(summary_paragraph_1)
         st.write(summary_paragraph_2)
+        st.pyplot(generate_wordcloud(text))
