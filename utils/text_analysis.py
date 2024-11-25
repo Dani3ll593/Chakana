@@ -9,7 +9,7 @@ from nltk.tokenize import word_tokenize
 import nltk
 import os
 
-nltk_data_dir = "E:\HACKATONS\LLAMA\CHAKANA\Python\utils\nltk_data"  # Cambia esta ruta según tu sistema
+nltk_data_dir = "E:/HACKATONS/LLAMA/CHAKANA/Python/utils/nltk_data"  # Cambia esta ruta según tu sistema
 os.makedirs(nltk_data_dir, exist_ok=True)
 nltk.data.path.append(nltk_data_dir)
 
