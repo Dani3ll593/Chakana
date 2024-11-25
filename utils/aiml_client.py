@@ -3,6 +3,7 @@ import re
 import logging
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+import json
 
 class AIMLClient:
     def __init__(self, api_url, api_key):
@@ -19,7 +20,8 @@ class AIMLClient:
     def _make_request(self, endpoint, payload):
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         try:
-            response = self.session.post(endpoint, headers=headers, json=payload)
+            json_payload = json.dumps(payload)  # Validar el formato del payload
+            response = self.session.post(endpoint, headers=headers, data=json_payload)
             response.raise_for_status()
             logging.info(f"API Response: {response.json()}")  # Agregar log para la respuesta de la API
             return response.json()

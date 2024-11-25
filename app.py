@@ -94,16 +94,24 @@ def export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, sum
         logging.error(f"Error al exportar el reporte: {e}")
         raise ValueError(f"Error al exportar el reporte: {e}")
 
+def split_text(text, max_length=5000):
+    """Divide el texto en partes más pequeñas de longitud máxima."""
+    return [text[i:i+max_length] for i in range(0, len(text), max_length)]
+
 def perform_analysis(text):
     try:
         if not text or len(text.strip()) == 0:
             raise ValueError("El texto proporcionado es inválido o está vacío.")
         analysis_result = analyze_text(text)
-        academic_quality_result = client.analyze_academic_quality(text)
-        logging.info(f"Academic Quality Result: {academic_quality_result}")
-        if academic_quality_result and 'analysis' in academic_quality_result[0]:
-            summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-            summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+        text_segments = split_text(text)
+        academic_quality_results = []
+        for segment in text_segments:
+            academic_quality_result = client.analyze_academic_quality(segment)
+            academic_quality_results.extend(academic_quality_result)
+        logging.info(f"Academic Quality Result: {academic_quality_results}")
+        if academic_quality_results and 'analysis' in academic_quality_results[0]:
+            summary_paragraph_1 = academic_quality_results[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+            summary_paragraph_2 = academic_quality_results[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
             summary_paragraph_3 = (
                 f"Análisis de sentimiento: {analysis_result['Análisis de sentimiento']}\n"
                 f"Legibilidad: {analysis_result['Legibilidad']}\n"
