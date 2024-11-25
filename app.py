@@ -132,9 +132,28 @@ def perform_analysis(text):
         st.error(f"Error inesperado: {e}")
         return None, None, None, None
 
+def format_analysis_result(analysis_result):
+    formatted_result = (
+        f"**Idioma:** {analysis_result['Idioma']}\n"
+        f"**Número de palabras:** {analysis_result['Número de palabras']}\n"
+        f"**Número de caracteres:** {analysis_result['Número de caracteres']}\n"
+        f"**Número de oraciones:** {analysis_result['Número de oraciones']}\n"
+        f"**Palabras más comunes:**\n"
+    )
+    for word_info in analysis_result['Palabras más comunes']:
+        formatted_result += f"  - {word_info['palabra']}: {word_info['frecuencia']}\n"
+    formatted_result += (
+        f"**Análisis de sentimiento:**\n"
+        f"  - Polaridad: {analysis_result['Análisis de sentimiento']['Polaridad']}\n"
+        f"  - Subjetividad: {analysis_result['Análisis de sentimiento']['Subjetividad']}\n"
+        f"**Legibilidad:** {analysis_result['Legibilidad']}\n"
+        f"**Diversidad léxica:** {analysis_result['Diversidad léxica']}\n"
+    )
+    return formatted_result
+
 with col1:
     st.subheader("Texto para Análisis")
-    pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200, key="pasted_text")
+    pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200, key="pasted_text_area")
 
     if st.button("🔍 Analizar texto pegado"):
         if pasted_text.strip():
@@ -144,9 +163,9 @@ with col1:
                     with col2:
                         st.subheader("Resultados del Análisis")
                         st.markdown("### Análisis de texto")
-                        st.text_area("Análisis de texto", str(analysis_result), height=200)
+                        st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area")
                         st.markdown("### Análisis de IA")
-                        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200)
+                        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area")
                         try:
                             wordcloud_image = generate_wordcloud(pasted_text)
                             st.pyplot(wordcloud_image)
@@ -165,7 +184,7 @@ with col1:
                     if not text or len(text.strip()) == 0:
                         raise ValueError("El documento cargado no contiene texto válido.")
                     st.success("Documento cargado con éxito.")
-                    st.text_area("Texto del documento", text, height=300, key="uploaded_text")
+                    st.text_area("Texto del documento", text, height=300, key="uploaded_text_area")
 
                     if st.button("🔍 Analizar archivo"):
                         analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = perform_analysis(text)
@@ -173,9 +192,9 @@ with col1:
                             with col2:
                                 st.subheader("Resultados del Análisis")
                                 st.markdown("### Análisis de texto")
-                                st.text_area("Análisis de texto", str(analysis_result), height=200)
+                                st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area_file")
                                 st.markdown("### Análisis de IA")
-                                st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200)
+                                st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area_file")
                                 try:
                                     wordcloud_image = generate_wordcloud(text)
                                     st.pyplot(wordcloud_image)
@@ -188,10 +207,10 @@ with col2:
     st.subheader("Resultados del Análisis")
     if 'analysis_result' in locals():
         st.markdown("### Análisis de texto")
-        st.text_area("Análisis de texto", str(analysis_result), height=200)
+        st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area_results")
     if 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals() and 'summary_paragraph_3' in locals():
         st.markdown("### Análisis de IA")
-        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200)
+        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area_results")
 
 st.markdown("---")
 st.subheader("Términos más destacados")
