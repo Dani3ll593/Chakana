@@ -1,9 +1,9 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-from utils.aiml_client import AIMLClient
-from utils.file_utils import extract_text
-from utils.text_analysis import analyze_text
+from aiml_client import AIMLClient
+from file_utils import extract_text, save_file
+from text_analysis import analyze_text, generate_wordcloud
 
 # Cargar variables de entorno
 load_dotenv()
@@ -31,9 +31,15 @@ if st.button("Analizar texto con IA"):
     if pasted_text.strip():
         with st.spinner("Analizando texto con IA..."):
             try:
-                analysis_results = analyze_text(pasted_text)
-                st.write("### Resultados del análisis:")
-                st.json(analysis_results)
+                # Análisis básico
+                basic_analysis = analyze_text(pasted_text)
+                st.write("### Resultados del análisis básico:")
+                st.json(basic_analysis)
+
+                # Análisis avanzado (calidad académica)
+                advanced_analysis = client.analyze_academic_quality(pasted_text)
+                st.write("### Resultados del análisis avanzado:")
+                st.json(advanced_analysis)
             except Exception as e:
                 st.error(f"Error al analizar el texto: {e}")
     else:
@@ -42,19 +48,34 @@ if st.button("Analizar texto con IA"):
 # Procesamiento del archivo si se carga
 if uploaded_file:
     with st.spinner("Cargando documento..."):
-        text = extract_text(uploaded_file)
-        st.success("Documento cargado con éxito.")
-        st.write(f"### Contenido del documento ({len(text.split())} palabras):")
-        st.text_area("Texto del documento", text, height=300)
+        try:
+            text = extract_text(uploaded_file)
+            st.success("Documento cargado con éxito.")
+            st.write(f"### Contenido del documento ({len(text.split())} palabras):")
+            st.text_area("Texto del documento", text, height=300)
 
-    # Botón para analizar el texto del archivo
-    if st.button("Analizar texto del documento con IA"):
-        with st.spinner("Analizando texto del documento con IA..."):
-            try:
-                analysis_results = analyze_text(text)
-                st.write("### Resultados del análisis:")
-                st.json(analysis_results)
-            except Exception as e:
-                st.error(f"Error al analizar el texto: {e}")
+            # Botón para analizar el texto del archivo
+            if st.button("Analizar texto del documento con IA"):
+                with st.spinner("Analizando texto del documento con IA..."):
+                    try:
+                        # Análisis básico
+                        basic_analysis = analyze_text(text)
+                        st.write("### Resultados del análisis básico:")
+                        st.json(basic_analysis)
 
+                        # Análisis avanzado (calidad académica)
+                        advanced_analysis = client.analyze_academic_quality(text)
+                        st.write("### Resultados del análisis avanzado:")
+                        st.json(advanced_analysis)
+
+                        # Generar nube de palabras
+                        st.subheader("Nube de Palabras")
+                        wordcloud_fig = generate_wordcloud(text)
+                        st.pyplot(wordcloud_fig)
+                    except Exception as e:
+                        st.error(f"Error al analizar el texto: {e}")
+        except Exception as e:
+            st.error(f"Error al procesar el archivo: {e}")
+
+# Barra lateral de información
 st.sidebar.markdown("**Hecho con ❤️ por Streamlit**")
