@@ -24,8 +24,8 @@ class AIMLClient:
             logging.info(f"API Response: {response.json()}")  # Agregar log para la respuesta de la API
             return response.json()
         except requests.exceptions.HTTPError as e:
-            logging.error(f"Error HTTP al comunicarse con la API: {e.response.status_code} {e.response.reason}")
-            raise ValueError(f"Error HTTP al comunicarse con la API: {e.response.status_code} {e.response.reason}")
+            logging.error(f"Error HTTP al comunicarse con la API: {e.response.status_code} {e.response.text}")
+            raise ValueError(f"Error HTTP al comunicarse con la API: {e.response.status_code} {e.response.text}")
         except requests.exceptions.RequestException as e:
             logging.error(f"Error al comunicarse con la API: {e}")
             raise ValueError(f"Error al comunicarse con la API: {e}")
