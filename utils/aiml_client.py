@@ -58,6 +58,9 @@ class AIMLClient2:
 
     def analyze_academic_quality(self, text):
         sections = self.split_into_sections(text)
+        if not sections:
+            raise ValueError("No se encontraron secciones válidas en el texto.")
+        
         results = []
         for section in sections:
             section_text = section["content"].strip()
@@ -73,6 +76,7 @@ class AIMLClient2:
                         "section_title": section["title"],
                         "error": str(e)
                     })
+        
         if results:
             summary_paragraph_1 = results[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.") if 'analysis' in results[0] else "Error en la generación del análisis."
             summary_paragraph_2 = results[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.") if 'analysis' in results[0] else "Consulta los logs para más detalles."
