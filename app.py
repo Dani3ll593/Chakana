@@ -73,15 +73,9 @@ if st.button("🔍 Analizar texto pegado"):
                 analysis_result = analyze_text(pasted_text)
                 st.json(analysis_result)
                 academic_quality_result = client.analyze_academic_quality(pasted_text)
-                st.markdown("### Análisis de calidad académica")
-                for result in academic_quality_result:
-                    st.markdown(f"**{result['section_title']}**")
-                    st.json(result['analysis'])
-                    if 'paragraph' in result['analysis']:
-                        st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
-                # Generar dos párrafos de resumen
-                summary_paragraph_1 = "El texto presenta una claridad moderada con buena coherencia, aunque algunos puntos carecen de profundidad."
-                summary_paragraph_2 = "El uso de fuentes confiables es adecuado, pero el texto podría beneficiarse de un análisis más crítico y un mayor enfoque académico."
+                # Generar dos párrafos de resumen basados en el análisis del modelo
+                summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+                summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
                 st.markdown("### Resumen del Análisis")
                 st.write(summary_paragraph_1)
                 st.write(summary_paragraph_2)
@@ -101,18 +95,12 @@ if uploaded_file:
                 analysis_result = analyze_text(text)
                 st.json(analysis_result)
                 academic_quality_result = client.analyze_academic_quality(text)
-                st.markdown("### Análisis de calidad académica")
-                for result in academic_quality_result:
-                    st.markdown(f"**{result['section_title']}**")
-                    st.json(result['analysis'])
-                    if 'paragraph' in result['analysis']:
-                        st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
-                st.pyplot(generate_wordcloud(text))
-                # Generar dos párrafos de resumen
-                summary_paragraph_1 = "El texto presenta una claridad moderada con buena coherencia, aunque algunos puntos carecen de profundidad."
-                summary_paragraph_2 = "El uso de fuentes confiables es adecuado, pero el texto podría beneficiarse de un análisis más crítico y un mayor enfoque académico."
+                # Generar dos párrafos de resumen basados en el análisis del modelo
+                summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+                summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
                 st.markdown("### Resumen del Análisis")
                 st.write(summary_paragraph_1)
                 st.write(summary_paragraph_2)
+                st.pyplot(generate_wordcloud(text))
     except Exception as e:
         st.error(f"Error al procesar el archivo: {e}")
