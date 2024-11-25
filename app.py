@@ -160,17 +160,16 @@ with col1:
             with st.spinner("Analizando texto..."):
                 analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = perform_analysis(pasted_text)
                 if analysis_result:
-                    with col2:
-                        st.subheader("Resultados del Análisis")
-                        st.markdown("### Análisis de texto")
-                        st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area")
-                        st.markdown("### Análisis de IA")
-                        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area")
-                        try:
-                            wordcloud_image = generate_wordcloud(pasted_text)
-                            st.pyplot(wordcloud_image)
-                        except ValueError as e:
-                            st.error(f"Error al generar la nube de palabras: {e}")
+                    st.subheader("Resultados del Análisis")
+                    st.markdown("### Análisis de texto")
+                    st.markdown(format_analysis_result(analysis_result))
+                    st.markdown("### Análisis de IA")
+                    st.markdown(f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}")
+                    try:
+                        wordcloud_image = generate_wordcloud(pasted_text)
+                        st.pyplot(wordcloud_image)
+                    except ValueError as e:
+                        st.error(f"Error al generar la nube de palabras: {e}")
         else:
             st.warning("Por favor, ingrese texto para analizar.")
 
@@ -191,9 +190,9 @@ with col1:
                         if analysis_result:
                             st.subheader("Resultados del Análisis")
                             st.markdown("### Análisis de texto")
-                            st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area_file")
+                            st.markdown(format_analysis_result(analysis_result))
                             st.markdown("### Análisis de IA")
-                            st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area_file")
+                            st.markdown(f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}")
                             try:
                                 wordcloud_image = generate_wordcloud(text)
                                 st.pyplot(wordcloud_image)
@@ -201,15 +200,6 @@ with col1:
                                 st.error(f"Error al generar la nube de palabras: {e}")
                 except Exception as e:
                     st.error(f"Error al procesar el archivo: {e}")
-
-with col2:
-    st.subheader("Resultados del Análisis")
-    if 'analysis_result' in locals():
-        st.markdown("### Análisis de texto")
-        st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area_results")
-    if 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals() and 'summary_paragraph_3' in locals():
-        st.markdown("### Análisis de IA")
-        st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area_results")
 
 st.markdown("---")
 st.subheader("Términos más destacados")
