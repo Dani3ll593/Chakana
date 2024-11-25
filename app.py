@@ -136,8 +136,11 @@ with col1:
     if st.button("🔍 Analizar texto pegado"):
         if pasted_text.strip():
             with st.spinner("Analizando texto..."):
-                analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = perform_analysis(pasted_text)
+                analysis_result = perform_analysis(pasted_text)
                 if analysis_result:
+                    summary_paragraph_1 = "Resumen del análisis 1"
+                    summary_paragraph_2 = "Resumen del análisis 2"
+                    summary_paragraph_3 = "Resumen del análisis 3"
                     with col2:
                         st.subheader("Resultados del Análisis")
                         st.markdown("### Análisis de texto")
@@ -160,8 +163,11 @@ with col1:
                     st.text_area("Texto del documento", text, height=300, key="uploaded_text_area")
 
                     if st.button("🔍 Analizar archivo"):
-                        analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = perform_analysis(text)
+                        analysis_result = perform_analysis(text)
                         if analysis_result:
+                            summary_paragraph_1 = "Resumen del análisis 1"
+                            summary_paragraph_2 = "Resumen del análisis 2"
+                            summary_paragraph_3 = "Resumen del análisis 3"
                             with col2:
                                 st.subheader("Resultados del Análisis")
                                 st.markdown("### Análisis de texto")
