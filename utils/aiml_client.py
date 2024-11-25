@@ -32,7 +32,7 @@ class AIMLClient2:
     def analyze_text(self, text):
         if not text or not isinstance(text, str) or len(text.strip()) == 0:
             raise ValueError("El texto proporcionado es inválido o está vacío.")
-        endpoint = f"{self.api_url}/analyze"
+        endpoint = f"{self.api_url} 
         payload = {
             "text": text,
             "model": "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
