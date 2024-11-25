@@ -70,17 +70,24 @@ uploaded_file = st.sidebar.file_uploader("📤 Cargar documento", type=["txt", "
 
 col1, col2 = st.columns([1, 1])
 
-def export_report(summary_paragraph_1, summary_paragraph_2, file_name="reporte_analisis.pdf"):
+def export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, wordcloud_image, file_name="reporte_analisis.pdf"):
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Arial", size=12)
     pdf.multi_cell(0, 10, "Reporte de Análisis de Calidad Académica")
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, "Análisis del Texto:")
+    pdf.ln(5)
+    pdf.multi_cell(0, 10, str(analysis_result))
     pdf.ln(10)
     pdf.multi_cell(0, 10, "Resumen del Análisis:")
     pdf.ln(5)
     pdf.multi_cell(0, 10, summary_paragraph_1)
     pdf.ln(10)
     pdf.multi_cell(0, 10, summary_paragraph_2)
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, "Nube de Palabras:")
+    pdf.image(wordcloud_image, x=10, y=None, w=190)
     pdf.output(file_name)
     return file_name
 
@@ -116,7 +123,8 @@ with col1:
                         st.write(summary_paragraph_1)
                         st.write(summary_paragraph_2)
                         try:
-                            st.pyplot(generate_wordcloud(pasted_text))
+                            wordcloud_image = generate_wordcloud(pasted_text)
+                            st.pyplot(wordcloud_image)
                         except ValueError as e:
                             st.error(f"Error al generar la nube de palabras: {e}")
         else:
@@ -142,16 +150,41 @@ with col1:
                                 st.write(summary_paragraph_1)
                                 st.write(summary_paragraph_2)
                                 try:
-                                    st.pyplot(generate_wordcloud(text))
+                                    wordcloud_image = generate_wordcloud(text)
+                                    st.pyplot(wordcloud_image)
                                 except ValueError as e:
                                     st.error(f"Error al generar la nube de palabras: {e}")
                 except Exception as e:
                     st.error(f"Error al procesar el archivo: {e}")
 
-if st.button("📄 Exportar reporte"):
+with col2:
+    st.subheader("Resultados del Análisis")
+    if 'analysis_result' in locals():
+        st.json(analysis_result)
     if 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals():
+        st.markdown("### Resumen del Análisis")
+        st.write(summary_paragraph_1)
+        st.write(summary_paragraph_2)
+
+st.markdown("---")
+st.subheader("Términos más destacados")
+if 'pasted_text' in locals() and pasted_text.strip():
+    try:
+        wordcloud_image = generate_wordcloud(pasted_text)
+        st.pyplot(wordcloud_image)
+    except ValueError as e:
+        st.error(f"Error al generar la nube de palabras: {e}")
+elif 'text' in locals() and text.strip():
+    try:
+        wordcloud_image = generate_wordcloud(text)
+        st.pyplot(wordcloud_image)
+    except ValueError as e:
+        st.error(f"Error al generar la nube de palabras: {e}")
+
+if st.button("📄 Exportar reporte"):
+    if 'analysis_result' in locals() and 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals() and 'wordcloud_image' in locals():
         try:
-            report_file = export_report(summary_paragraph_1, summary_paragraph_2)
+            report_file = export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, wordcloud_image)
             st.success(f"Reporte exportado exitosamente: {report_file}")
             with open(report_file, "rb") as file:
                 btn = st.download_button(
@@ -164,16 +197,3 @@ if st.button("📄 Exportar reporte"):
             st.error(f"Error al exportar el reporte: {e}")
     else:
         st.warning("No hay datos de análisis disponibles para exportar.")
-
-st.markdown("---")
-st.subheader("Términos más destacados")
-if 'pasted_text' in locals() and pasted_text.strip():
-    try:
-        st.pyplot(generate_wordcloud(pasted_text))
-    except ValueError as e:
-        st.error(f"Error al generar la nube de palabras: {e}")
-elif 'text' in locals() and text.strip():
-    try:
-        st.pyplot(generate_wordcloud(text))
-    except ValueError as e:
-        st.error(f"Error al generar la nube de palabras: {e}")
