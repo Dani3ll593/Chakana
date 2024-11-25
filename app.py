@@ -90,6 +90,8 @@ def export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, fil
 
 def perform_analysis(text):
     try:
+        if not text or len(text.strip()) == 0:
+            raise ValueError("El texto proporcionado es inválido o está vacío.")
         analysis_result = analyze_text(text)
         academic_quality_result = client.analyze_academic_quality(text)
         logging.info(f"Academic Quality Result: {academic_quality_result}")
@@ -98,7 +100,9 @@ def perform_analysis(text):
             summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
             return analysis_result, summary_paragraph_1, summary_paragraph_2
         else:
-            raise ValueError("No se pudo generar el análisis de calidad académica.")
+            summary_paragraph_1 = "Error en la generación del análisis."
+            summary_paragraph_2 = "Consulta los logs para más detalles."
+            return analysis_result, summary_paragraph_1, summary_paragraph_2
     except ValueError as e:
         logging.error(f"Error al analizar el texto: {e}")
         st.error(f"Error al analizar el texto: {e}")
@@ -138,6 +142,8 @@ with col1:
             with st.spinner("Procesando archivo..."):
                 try:
                     text = extract_text(uploaded_file)
+                    if not text or len(text.strip()) == 0:
+                        raise ValueError("El documento cargado no contiene texto válido.")
                     st.success("Documento cargado con éxito.")
                     st.text_area("Texto del documento", text, height=300, key="uploaded_text")
 

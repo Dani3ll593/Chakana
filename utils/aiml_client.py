@@ -31,6 +31,8 @@ class AIMLClient:
             raise ValueError(f"Error al comunicarse con la API: {e}")
 
     def analyze_text(self, text):
+        if not text or not isinstance(text, str) or len(text.strip()) == 0:
+            raise ValueError("El texto proporcionado es inválido o está vacío.")
         endpoint = f"{self.api_url}/analyze"
         payload = {
             "text": text,
@@ -50,6 +52,7 @@ class AIMLClient:
                 "5. Contribución significativa al campo académico o tema en cuestión."
             )
         }
+        logging.info(f"Enviando payload a {endpoint}: {payload}")
         return self._make_request(endpoint, payload)
 
     def analyze_sentiment(self, text):
