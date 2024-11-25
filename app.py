@@ -98,17 +98,17 @@ def perform_analysis(text):
     try:
         if not text or len(text.strip()) == 0:
             raise ValueError("El texto proporcionado es inválido o está vacío.")
-        analysis_result = client.analyze_academic_quality(text)
+        analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = client.analyze_academic_quality(text)
         logging.info(f"Academic Quality Result: {analysis_result}")
-        return analysis_result
+        return analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3
     except ValueError as e:
         logging.error(f"Error al analizar el texto: {e}")
         st.error(f"Error al analizar el texto: {e}")
-        return None
+        return None, None, None, None
     except Exception as e:
         logging.error(f"Error inesperado: {e}")
         st.error(f"Error inesperado: {e}")
-        return None
+        return None, None, None, None
 
 def format_analysis_result(analysis_result):
     formatted_result = (
@@ -136,11 +136,8 @@ with col1:
     if st.button("🔍 Analizar texto pegado"):
         if pasted_text.strip():
             with st.spinner("Analizando texto..."):
-                analysis_result = perform_analysis(pasted_text)
+                analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = perform_analysis(pasted_text)
                 if analysis_result:
-                    summary_paragraph_1 = "Resumen del análisis 1"
-                    summary_paragraph_2 = "Resumen del análisis 2"
-                    summary_paragraph_3 = "Resumen del análisis 3"
                     with col2:
                         st.subheader("Resultados del Análisis")
                         st.markdown("### Análisis de texto")
@@ -163,11 +160,8 @@ with col1:
                     st.text_area("Texto del documento", text, height=300, key="uploaded_text_area")
 
                     if st.button("🔍 Analizar archivo"):
-                        analysis_result = perform_analysis(text)
+                        analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = perform_analysis(text)
                         if analysis_result:
-                            summary_paragraph_1 = "Resumen del análisis 1"
-                            summary_paragraph_2 = "Resumen del análisis 2"
-                            summary_paragraph_3 = "Resumen del análisis 3"
                             with col2:
                                 st.subheader("Resultados del Análisis")
                                 st.markdown("### Análisis de texto")
