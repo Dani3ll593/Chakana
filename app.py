@@ -98,7 +98,7 @@ def perform_analysis(text):
     try:
         if not text or len(text.strip()) == 0:
             raise ValueError("El texto proporcionado es inválido o está vacío.")
-        analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = client.analyze_academic_quality(text)
+        analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = client.analyze_text(text)
         logging.info(f"Academic Quality Result: {analysis_result}")
         return analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3
     except ValueError as e:

@@ -2,8 +2,6 @@ import requests
 import logging
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
-import json
-import re
 
 class AIMLClient2:
     def __init__(self, api_url, api_key):
@@ -55,45 +53,3 @@ class AIMLClient2:
         }
         logging.info(f"Enviando payload a {endpoint}: {payload}")
         return self._make_request(endpoint, payload)
-
-    def analyze_academic_quality(self, text):
-        if not text or not isinstance(text, str) or len(text.strip()) == 0:
-            raise ValueError("El texto proporcionado es inválido o está vacío.")
-        
-        try:
-            analysis_result = self.analyze_text(text)
-            summary_paragraph_1 = analysis_result.get('summary_paragraph_1', "No se pudo generar el resumen.")
-            summary_paragraph_2 = analysis_result.get('summary_paragraph_2', "No se pudo generar el resumen.")
-            summary_paragraph_3 = (
-                f"Análisis de sentimiento: {analysis_result['Análisis de sentimiento']}\n"
-                f"Legibilidad: {analysis_result['Legibilidad']}\n"
-                f"Diversidad léxica: {analysis_result['Diversidad léxica']}"
-            )
-            return analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3
-        except ValueError as e:
-            logging.error(f"Error al analizar el texto: {e}")
-            raise ValueError(f"Error al analizar el texto: {e}")
-        except Exception as e:
-            logging.error(f"Error inesperado: {e}")
-            raise ValueError(f"Error inesperado: {e}")
-
-    def analyze_document(self, text):
-        try:
-            if not text or len(text.strip()) == 0:
-                raise ValueError("El texto proporcionado es inválido o está vacío.")
-            analysis_result = self.analyze_text(text)
-            logging.info(f"Academic Quality Result: {analysis_result}")
-            summary_paragraph_1 = analysis_result.get('summary_paragraph_1', "No se pudo generar el resumen.")
-            summary_paragraph_2 = analysis_result.get('summary_paragraph_2', "No se pudo generar el resumen.")
-            summary_paragraph_3 = (
-                f"Análisis de sentimiento: {analysis_result['Análisis de sentimiento']}\n"
-                f"Legibilidad: {analysis_result['Legibilidad']}\n"
-                f"Diversidad léxica: {analysis_result['Diversidad léxica']}"
-            )
-            return analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3
-        except ValueError as e:
-            logging.error(f"Error al analizar el texto: {e}")
-            raise ValueError(f"Error al analizar el texto: {e}")
-        except Exception as e:
-            logging.error(f"Error inesperado: {e}")
-            raise ValueError(f"Error inesperado: {e}")
