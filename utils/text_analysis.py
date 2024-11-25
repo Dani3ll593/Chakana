@@ -6,19 +6,12 @@ from langdetect import detect
 from textblob import TextBlob
 from nltk.tokenize import word_tokenize
 
+# Inicializar recursos de NLTK
 import nltk
-import os
-
-nltk.download('punkt', download_dir='E:/HACKATONS/LLAMA/CHAKANA/Python/utils/nltk_data')
-nltk_data_dir = "E:/HACKATONS/LLAMA/CHAKANA/Python/utils/nltk_data"
-os.makedirs(nltk_data_dir, exist_ok=True)
-nltk.data.path.append(nltk_data_dir)
-
 try:
-    from nltk.tokenize import word_tokenize
-except LookupError:
-    import nltk
-    nltk.download('punkt')
+    nltk.download('punkt', quiet=True)
+except Exception as e:
+    raise RuntimeError(f"Error al inicializar recursos NLTK: {e}")
 
 # Stopwords comunes en español
 STOPWORDS = {
