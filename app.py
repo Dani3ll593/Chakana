@@ -39,8 +39,13 @@ if st.button("🔍 Analizar texto pegado"):
     if pasted_text.strip():
         try:
             with st.spinner("Analizando texto..."):
-                st.json(analyze_text(pasted_text))
-                st.json(client.analyze_academic_quality(pasted_text))
+                analysis_result = analyze_text(pasted_text)
+                st.json(analysis_result)
+                academic_quality_result = client.analyze_academic_quality(pasted_text)
+                st.markdown("### Análisis de calidad académica")
+                for result in academic_quality_result:
+                    st.markdown(f"**{result['section_title']}**")
+                    st.json(result['analysis'])
         except Exception as e:
             st.error(f"Error al analizar el texto: {e}")
     else:
@@ -54,8 +59,13 @@ if uploaded_file:
             st.text_area("Texto del documento", text, height=300)
 
             if st.button("🔍 Analizar archivo"):
-                st.json(analyze_text(text))
-                st.json(client.analyze_academic_quality(text))
+                analysis_result = analyze_text(text)
+                st.json(analysis_result)
+                academic_quality_result = client.analyze_academic_quality(text)
+                st.markdown("### Análisis de calidad académica")
+                for result in academic_quality_result:
+                    st.markdown(f"**{result['section_title']}**")
+                    st.json(result['analysis'])
                 st.pyplot(generate_wordcloud(text))
     except Exception as e:
         st.error(f"Error al procesar el archivo: {e}")

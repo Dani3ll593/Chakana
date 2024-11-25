@@ -58,12 +58,15 @@ def analyze_text(text):
         sentiment = sentiment_analysis(text)
 
         return {
-            "language": language,
-            "word_count": word_count,
-            "char_count": char_count,
-            "sentence_count": sentence_count,
-            "most_common_words": most_common_words,
-            "sentiment": sentiment,
+            "Idioma": language,
+            "Número de palabras": word_count,
+            "Número de caracteres": char_count,
+            "Número de oraciones": sentence_count,
+            "Palabras más comunes": [{"palabra": word, "frecuencia": freq} for word, freq in most_common_words],
+            "Análisis de sentimiento": {
+                "Polaridad": sentiment["polarity"],
+                "Subjetividad": sentiment["subjectivity"]
+            },
         }
     except Exception as e:
         raise ValueError(f"Error en el análisis del texto: {e}")
