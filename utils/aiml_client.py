@@ -20,10 +20,9 @@ class AIMLClient:
     def _make_request(self, endpoint, payload):
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         try:
-            json_payload = json.dumps(payload)  # Validar el formato del payload
-            response = self.session.post(endpoint, headers=headers, data=json_payload)
+            response = self.session.post(endpoint, headers=headers, json=payload)
             response.raise_for_status()
-            logging.info(f"API Response: {response.json()}")  # Agregar log para la respuesta de la API
+            logging.info(f"API Response: {response.json()}")
             return response.json()
         except requests.exceptions.HTTPError as e:
             logging.error(f"Error HTTP al comunicarse con la API: {e.response.status_code} {e.response.text}")
@@ -38,12 +37,12 @@ class AIMLClient:
         endpoint = f"{self.api_url}/analyze"
         payload = {
             "text": text,
-            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Asegurar el uso del modelo especificado
-            "max_tokens": 500,  # Permitir hasta 500 tokens de salida
-            "temperature": 0.7,  # Asegurar que la temperatura sea 0.7
-            "top_p": 0.9,  # Ajustar top_p para mayor creatividad
-            "frequency_penalty": 0.5,  # Penalizar la frecuencia para evitar repeticiones
-            "presence_penalty": 0.6,  # Penalizar la presencia para fomentar la diversidad
+            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            "max_tokens": 500,
+            "temperature": 0.7,
+            "top_p": 0.9,
+            "frequency_penalty": 0.5,
+            "presence_penalty": 0.6,
             "prompt": (
                 "Por favor, realiza una revisión de la calidad académica del siguiente texto. "
                 "Evalúa los siguientes aspectos: "
@@ -61,8 +60,8 @@ class AIMLClient:
         endpoint = f"{self.api_url}/sentiment"
         payload = {
             "text": text,
-            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Asegurar el uso del modelo especificado
-            "max_tokens": 500  # Permitir hasta 500 tokens de salida
+            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            "max_tokens": 500
         }
         return self._make_request(endpoint, payload)
 

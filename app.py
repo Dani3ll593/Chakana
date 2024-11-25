@@ -214,7 +214,7 @@ if st.button("📄 Exportar reporte"):
             report_file = export_report(analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3)
             st.success(f"Reporte exportado exitosamente: {report_file}")
             with open(report_file, "rb") as file:
-                btn = st.download_button(
+                st.download_button(
                     label="Descargar reporte",
                     data=file,
                     file_name=report_file,
