@@ -35,7 +35,7 @@ class AIMLClient2:
         endpoint = f"{self.api_url}/analyze"
         payload = {
             "text": text,
-            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
+            "model": "meta-llama/Meta-Llama-3-70B-Instruct-Turbo",
             "max_tokens": 500,
             "temperature": 0.7,
             "top_p": 0.9,
