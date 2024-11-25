@@ -166,11 +166,6 @@ with col1:
                         st.markdown(format_analysis_result(analysis_result))
                         st.markdown("### Análisis de IA")
                         st.markdown(f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}")
-                        try:
-                            wordcloud_image = generate_wordcloud(pasted_text)
-                            st.pyplot(wordcloud_image)
-                        except ValueError as e:
-                            st.error(f"Error al generar la nube de palabras: {e}")
         else:
             st.warning("Por favor, ingrese texto para analizar.")
 
@@ -195,11 +190,6 @@ with col1:
                                 st.markdown(format_analysis_result(analysis_result))
                                 st.markdown("### Análisis de IA")
                                 st.markdown(f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}")
-                                try:
-                                    wordcloud_image = generate_wordcloud(text)
-                                    st.pyplot(wordcloud_image)
-                                except ValueError as e:
-                                    st.error(f"Error al generar la nube de palabras: {e}")
                 except Exception as e:
                     st.error(f"Error al procesar el archivo: {e}")
 
