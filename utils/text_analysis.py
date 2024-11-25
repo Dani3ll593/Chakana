@@ -16,7 +16,7 @@ except Exception as e:
 
 # Stopwords comunes en español
 STOPWORDS = {
-    "y", "que", "de", "la", "el", "en", "es", "a", "los", "se", "del", "las", "por",
+    "y", "para", "que", "de", "la", "el", "en", "es", "a", "los", "se", "del", "las", "por",
     "un", "con", "no", "una", "su", "al", "lo", "como", "más", "pero", "sus", "le",
     "ya", "o", "fue", "ha", "sí", "porque", "esta", "son", "entre", "cuando", "muy",
     "sin", "sobre", "también", "me", "hasta", "hay", "donde", "quien", "desde",
