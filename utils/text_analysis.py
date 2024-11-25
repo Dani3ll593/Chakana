@@ -7,10 +7,16 @@ from textblob import TextBlob
 from nltk.tokenize import word_tokenize
 
 import nltk
+import os
+
+nltk_data_dir = "E:\HACKATONS\LLAMA\CHAKANA\Python\utils\nltk_data"  # Cambia esta ruta según tu sistema
+os.makedirs(nltk_data_dir, exist_ok=True)
+nltk.data.path.append(nltk_data_dir)
+
 try:
-    nltk.download('punkt', quiet=True)
+    nltk.download('punkt', download_dir=nltk_data_dir, quiet=True)
 except Exception as e:
-    raise RuntimeError(f"Error al inicializar recursos NLTK: {e}")
+    raise RuntimeError(f"Error al descargar 'punkt': {e}")
 
 # Stopwords comunes en español
 STOPWORDS = {
