@@ -70,22 +70,15 @@ def analyze_text(text):
 
         return {
             "Idioma": language,
-            
             "Número de palabras": word_count,
-            
             "Número de caracteres": char_count,
-            
             "Número de oraciones": sentence_count,
-            
             "Palabras más comunes": [{"palabra": word, "frecuencia": freq} for word, freq in most_common_words],
-            
             "Análisis de sentimiento": {
                 "Polaridad": sentiment["polarity"],
                 "Subjetividad": sentiment["subjectivity"]
             },
-            
             "Legibilidad": readability_score,
-            
             "Diversidad léxica": lexical_diversity
         }
     except Exception as e:

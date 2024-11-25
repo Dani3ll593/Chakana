@@ -25,26 +25,23 @@ def save_file(content, file_name):
     except Exception as e:
         raise ValueError(f"Error al guardar el archivo: {e}")
 
-def extract_text(file):
+def extract_text(file_path):
     try:
-        file_type = getattr(file, "type", None)
-        if not file_type:
-            raise ValueError("El archivo cargado no tiene un tipo definido.")
-
-        if file_type == SUPPORTED_FILE_TYPES["pdf"]:
-            return extract_text_from_pdf(file)
-        elif file_type == SUPPORTED_FILE_TYPES["docx"]:
-            return extract_text_from_docx(file)
-        elif file_type == SUPPORTED_FILE_TYPES["txt"]:
-            return extract_text_from_txt(file)
+        file_extension = get_file_extension(file_path)
+        if file_extension == ".pdf":
+            return extract_text_from_pdf(file_path)
+        elif file_extension == ".docx":
+            return extract_text_from_docx(file_path)
+        elif file_extension == ".txt":
+            return extract_text_from_txt(file_path)
         else:
-            raise ValueError(f"Tipo de archivo no soportado: {file_type}")
+            raise ValueError(f"Tipo de archivo no soportado: {file_extension}")
     except Exception as e:
         raise ValueError(f"Error al extraer texto: {e}")
 
-def extract_text_from_pdf(file):
+def extract_text_from_pdf(file_path):
     try:
-        reader = PdfReader(file)
+        reader = PdfReader(file_path)
         text = []
         for page in reader.pages:
             page_text = page.extract_text()
@@ -54,26 +51,28 @@ def extract_text_from_pdf(file):
     except Exception as e:
         raise ValueError(f"Error al extraer texto del PDF: {e}")
 
-def extract_text_from_docx(file):
+def extract_text_from_docx(file_path):
     try:
-        doc = Document(file)
+        doc = Document(file_path)
         return " ".join([p.text for p in doc.paragraphs if p.text.strip()]).strip()
     except Exception as e:
         raise ValueError(f"Error al extraer texto del archivo DOCX: {e}")
 
-def extract_text_from_txt(file):
+def extract_text_from_txt(file_path):
     try:
-        return file.getvalue().decode("utf-8").strip()
+        with open(file_path, "r", encoding="utf-8") as f:
+            return f.read().strip()
     except UnicodeDecodeError:
         raise ValueError("Error al decodificar el archivo TXT. Verifica que esté en formato UTF-8.")
     except Exception as e:
         raise ValueError(f"Error al extraer texto del archivo TXT: {e}")
 
-def is_supported_file(file):
+def is_supported_file(file_path):
     try:
-        return getattr(file, "type", None) in SUPPORTED_FILE_TYPES.values()
-    except AttributeError:
-        return False
+        file_extension = get_file_extension(file_path)
+        return file_extension in SUPPORTED_FILE_TYPES.keys()
+    except Exception as e:
+        raise ValueError(f"Error al verificar el tipo de archivo: {e}")
 
 def get_file_extension(file_name):
     _, ext = os.path.splitext(file_name)
