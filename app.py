@@ -21,6 +21,9 @@ if not API_URL or not API_KEY:
 
 client = AIMLClient(api_url=API_URL, api_key=API_KEY)
 
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+
 st.set_page_config(page_title="Procesador de Documentos Inteligente", layout="wide", initial_sidebar_state="auto")
 st.title("📄 Procesador de Documentos Inteligente")
 
@@ -64,6 +67,34 @@ Esta herramienta permite:
 
 uploaded_file = st.sidebar.file_uploader("📤 Cargar documento", type=["txt", "pdf", "docx"], accept_multiple_files=False, key="file_uploader", help="Límite de tamaño de archivo: 50 MB")
 
+col1, col2 = st.columns(2)
+
+with col1:
+    st.subheader("Pegue su texto aquí")
+    pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200, key="pasted_text")
+
+    if st.button("🔍 Analizar texto pegado"):
+        if pasted_text.strip():
+            try:
+                with st.spinner("Analizando texto..."):
+                    analysis_result = analyze_text(pasted_text)
+                    st.json(analysis_result)
+                    academic_quality_result = client.analyze_academic_quality(pasted_text)
+                    logging.info(f"Academic Quality Result: {academic_quality_result}")  # Agregar log para la respuesta de calidad académica
+                    if academic_quality_result and 'analysis' in academic_quality_result[0]:
+                        # Generar dos párrafos de resumen basados en el análisis del modelo
+                        summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+                        summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+                        st.markdown("### Resumen del Análisis")
+                        st.write(summary_paragraph_1)
+                        st.write(summary_paragraph_2)
+                    else:
+                        st.warning("No se pudo generar el análisis de calidad académica.")
+            except Exception as e:
+                st.error(f"Error al analizar el texto: {e}")
+        else:
+            st.warning("Por favor, ingrese texto para analizar.")
+
 if uploaded_file:
     if uploaded_file.size > 50 * 1024 * 1024:
         st.error("El archivo supera el límite de tamaño de 50 MB. Por favor, sube un archivo más pequeño.")
@@ -92,27 +123,13 @@ if uploaded_file:
         except Exception as e:
             st.error(f"Error al procesar el archivo: {e}")
 
-st.subheader("Pegue su texto aquí")
-pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200, key="pasted_text")
-
-if st.button("🔍 Analizar texto pegado"):
-    if pasted_text.strip():
-        try:
-            with st.spinner("Analizando texto..."):
-                analysis_result = analyze_text(pasted_text)
-                st.json(analysis_result)
-                academic_quality_result = client.analyze_academic_quality(pasted_text)
-                logging.info(f"Academic Quality Result: {academic_quality_result}")  # Agregar log para la respuesta de calidad académica
-                if academic_quality_result and 'analysis' in academic_quality_result[0]:
-                    # Generar dos párrafos de resumen basados en el análisis del modelo
-                    summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-                    summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
-                    st.markdown("### Resumen del Análisis")
-                    st.write(summary_paragraph_1)
-                    st.write(summary_paragraph_2)
-                else:
-                    st.warning("No se pudo generar el análisis de calidad académica.")
-        except Exception as e:
-            st.error(f"Error al analizar el texto: {e}")
-    else:
-        st.warning("Por favor, ingrese texto para analizar.")
+with col2:
+    st.subheader("Resultados del Análisis")
+    if 'analysis_result' in locals():
+        st.json(analysis_result)
+    if 'academic_quality_result' in locals() and academic_quality_result and 'analysis' in academic_quality_result[0]:
+        summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+        summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+        st.markdown("### Resumen del Análisis")
+        st.write(summary_paragraph_1)
+        st.write(summary_paragraph_2)
