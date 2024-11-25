@@ -73,12 +73,15 @@ if st.button("🔍 Analizar texto pegado"):
                 analysis_result = analyze_text(pasted_text)
                 st.json(analysis_result)
                 academic_quality_result = client.analyze_academic_quality(pasted_text)
-                # Generar dos párrafos de resumen basados en el análisis del modelo
-                summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-                summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
-                st.markdown("### Resumen del Análisis")
-                st.write(summary_paragraph_1)
-                st.write(summary_paragraph_2)
+                if academic_quality_result:
+                    # Generar dos párrafos de resumen basados en el análisis del modelo
+                    summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+                    summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+                    st.markdown("### Resumen del Análisis")
+                    st.write(summary_paragraph_1)
+                    st.write(summary_paragraph_2)
+                else:
+                    st.warning("No se pudo generar el análisis de calidad académica.")
         except Exception as e:
             st.error(f"Error al analizar el texto: {e}")
     else:
@@ -95,12 +98,15 @@ if uploaded_file:
                 analysis_result = analyze_text(text)
                 st.json(analysis_result)
                 academic_quality_result = client.analyze_academic_quality(text)
-                # Generar dos párrafos de resumen basados en el análisis del modelo
-                summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
-                summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
-                st.markdown("### Resumen del Análisis")
-                st.write(summary_paragraph_1)
-                st.write(summary_paragraph_2)
-                st.pyplot(generate_wordcloud(text))
+                if academic_quality_result:
+                    # Generar dos párrafos de resumen basados en el análisis del modelo
+                    summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+                    summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+                    st.markdown("### Resumen del Análisis")
+                    st.write(summary_paragraph_1)
+                    st.write(summary_paragraph_2)
+                    st.pyplot(generate_wordcloud(text))
+                else:
+                    st.warning("No se pudo generar el análisis de calidad académica.")
     except Exception as e:
         st.error(f"Error al procesar el archivo: {e}")
