@@ -6,7 +6,6 @@ from langdetect import detect
 from textblob import TextBlob
 from nltk.tokenize import word_tokenize
 
-# Inicializar recursos de NLTK
 import nltk
 try:
     nltk.download('punkt', quiet=True)
@@ -51,11 +50,9 @@ def analyze_text(text):
         word_count = len(text.split())
         char_count = len(text)
         sentence_count = len(re.findall(r'[.!?]', text))
-
         words = word_tokenize(text.lower())
         filtered_words = [word for word in words if word not in STOPWORDS]
         most_common_words = Counter(filtered_words).most_common(5)
-
         sentiment = sentiment_analysis(text)
 
         return {
