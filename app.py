@@ -46,6 +46,7 @@ if st.button("🔍 Analizar texto pegado"):
                 for result in academic_quality_result:
                     st.markdown(f"**{result['section_title']}**")
                     st.json(result['analysis'])
+                    st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
         except Exception as e:
             st.error(f"Error al analizar el texto: {e}")
     else:
@@ -66,6 +67,7 @@ if uploaded_file:
                 for result in academic_quality_result:
                     st.markdown(f"**{result['section_title']}**")
                     st.json(result['analysis'])
+                    st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
                 st.pyplot(generate_wordcloud(text))
     except Exception as e:
         st.error(f"Error al procesar el archivo: {e}")

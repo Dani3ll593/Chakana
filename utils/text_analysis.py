@@ -27,7 +27,8 @@ STOPWORDS = {
     "nosotros", "mi", "mis", "tus", "te", "ti", "tu", "sí", "mismo", "él", "sólo",
     "ellas", "hay", "tú", "vosotros", "vosotras", "os", "míos", "mías", "tuyo",
     "tuya", "tuyos", "tuyas", "suyo", "suya", "suyos", "suyas", "nuestro", "nuestra",
-    "nuestros", "nuestras", "vuestro", "vuestra", "vuestros", "vuestras"
+    "nuestros", "nuestras", "vuestro", "vuestra", "vuestros", "vuestras",
+    ".", ",", "(", ")", ":", ";", "!", "?", "-", "_", "[", "]", "{", "}", "\"", "'"
 }
 
 def detect_language(text):
