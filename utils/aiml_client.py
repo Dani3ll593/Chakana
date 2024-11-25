@@ -5,8 +5,7 @@ from requests.packages.urllib3.util.retry import Retry
 import json
 import re
 
-
-class AIMLClient:
+class AIMLClient2:
     def __init__(self, api_url, api_key):
         self.api_url = api_url
         self.api_key = api_key
@@ -57,18 +56,6 @@ class AIMLClient:
         logging.info(f"Enviando payload a {endpoint}: {payload}")
         return self._make_request(endpoint, payload)
 
-    def analyze_sentiment(self, text):
-        if not text or not isinstance(text, str) or len(text.strip()) == 0:
-            raise ValueError("El texto proporcionado es inválido o está vacío.")
-        endpoint = f"{self.api_url}/sentiment"
-        payload = {
-            "text": text,
-            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",
-            "max_tokens": 500
-        }
-        logging.info(f"Enviando payload a {endpoint}: {payload}")
-        return self._make_request(endpoint, payload)
-
     def analyze_academic_quality(self, text):
         sections = self.split_into_sections(text)
         results = []
@@ -106,3 +93,35 @@ class AIMLClient:
             sections.append(current_section)
 
         return sections
+
+    def analyze_document(self, text):
+        try:
+            if not text or len(text.strip()) == 0:
+                raise ValueError("El texto proporcionado es inválido o está vacío.")
+            analysis_result = self.analyze_text(text)
+            text_segments = self.split_into_sections(text)
+            academic_quality_results = []
+            for segment in text_segments:
+                academic_quality_result = self.analyze_academic_quality(segment["content"])
+                academic_quality_results.extend(academic_quality_result)
+            logging.info(f"Academic Quality Result: {academic_quality_results}")
+            if academic_quality_results and 'analysis' in academic_quality_results[0]:
+                summary_paragraph_1 = academic_quality_results[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
+                summary_paragraph_2 = academic_quality_results[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
+                summary_paragraph_3 = (
+                    f"Análisis de sentimiento: {analysis_result['Análisis de sentimiento']}\n"
+                    f"Legibilidad: {analysis_result['Legibilidad']}\n"
+                    f"Diversidad léxica: {analysis_result['Diversidad léxica']}"
+                )
+                return analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3
+            else:
+                summary_paragraph_1 = "Error en la generación del análisis."
+                summary_paragraph_2 = "Consulta los logs para más detalles."
+                summary_paragraph_3 = ""
+                return analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3
+        except ValueError as e:
+            logging.error(f"Error al analizar el texto: {e}")
+            raise ValueError(f"Error al analizar el texto: {e}")
+        except Exception as e:
+            logging.error(f"Error inesperado: {e}")
+            raise ValueError(f"Error inesperado: {e}")
