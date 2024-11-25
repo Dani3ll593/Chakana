@@ -34,47 +34,71 @@ def save_file(content, file_name):
 
 def extract_text(file):
     """
-    Extrae texto de archivos PDF, DOCX o TXT.
+    Extrae texto de un archivo cargado. Soporta PDF, DOCX y TXT.
     """
     try:
-        if file.type == SUPPORTED_FILE_TYPES["pdf"]:
+        # Validar si el archivo tiene atributo 'type'
+        file_type = getattr(file, "type", None)
+        if not file_type:
+            raise ValueError("El archivo cargado no tiene un tipo definido.")
+
+        # Procesar según el tipo de archivo
+        if file_type == SUPPORTED_FILE_TYPES["pdf"]:
             return extract_text_from_pdf(file)
-        elif file.type == SUPPORTED_FILE_TYPES["docx"]:
+        elif file_type == SUPPORTED_FILE_TYPES["docx"]:
             return extract_text_from_docx(file)
-        elif file.type == SUPPORTED_FILE_TYPES["txt"]:
-            return file.getvalue().decode("utf-8")
+        elif file_type == SUPPORTED_FILE_TYPES["txt"]:
+            return extract_text_from_txt(file)
         else:
-            raise ValueError(f"Tipo de archivo no soportado: {file.type}")
+            raise ValueError(f"Tipo de archivo no soportado: {file_type}")
     except Exception as e:
         raise ValueError(f"Error al extraer texto: {e}")
 
 def extract_text_from_pdf(file):
     """
-    Extrae texto de un archivo PDF.
+    Extrae texto de un archivo PDF utilizando PyPDF2.
     """
     try:
-        pdf_reader = PdfReader(file)
-        text = " ".join([page.extract_text() for page in pdf_reader.pages if page.extract_text()])
-        return text.strip()
+        reader = PdfReader(file)
+        text = []
+        for page in reader.pages:
+            page_text = page.extract_text()
+            if page_text:  # Verificar que la página tenga texto
+                text.append(page_text)
+        return " ".join(text).strip()
     except Exception as e:
         raise ValueError(f"Error al extraer texto del PDF: {e}")
 
 def extract_text_from_docx(file):
     """
-    Extrae texto de un archivo DOCX.
+    Extrae texto de un archivo DOCX utilizando python-docx.
     """
     try:
-        docx_reader = Document(file)
-        text = " ".join([paragraph.text for paragraph in docx_reader.paragraphs])
-        return text.strip()
+        doc = Document(file)
+        paragraphs = [p.text for p in doc.paragraphs if p.text.strip()]
+        return " ".join(paragraphs).strip()
     except Exception as e:
         raise ValueError(f"Error al extraer texto del archivo DOCX: {e}")
+
+def extract_text_from_txt(file):
+    """
+    Extrae texto de un archivo TXT.
+    """
+    try:
+        return file.getvalue().decode("utf-8").strip()
+    except UnicodeDecodeError:
+        raise ValueError("Error al decodificar el archivo TXT. Verifica que esté en formato UTF-8.")
+    except Exception as e:
+        raise ValueError(f"Error al extraer texto del archivo TXT: {e}")
 
 def is_supported_file(file):
     """
     Verifica si el archivo es de un tipo soportado.
     """
-    return file.type in SUPPORTED_FILE_TYPES.values()
+    try:
+        return getattr(file, "type", None) in SUPPORTED_FILE_TYPES.values()
+    except AttributeError:
+        return False
 
 def get_file_extension(file_name):
     """

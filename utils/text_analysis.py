@@ -1,73 +1,94 @@
-import os
-import streamlit as st
-from dotenv import load_dotenv
-from utils.api_handler import analyze_text, generate_report
-from utils.document_processor import process_uploaded_file
+import re
+from collections import Counter
+from wordcloud import WordCloud
+import matplotlib.pyplot as plt
+from langdetect import detect
+from textblob import TextBlob
+from nltk.tokenize import word_tokenize
 
-# Cargar variables de entorno
-load_dotenv()
+# Inicializar recursos de NLTK
+import nltk
+nltk.download('punkt')
 
-# Configuración de la página
-st.set_page_config(page_title="Revisión de Documentos", layout="wide")
-st.title("📄 Revisor de Redacción y Coherencia")
+# Stopwords comunes en español
+STOPWORDS = {
+    "y", "que", "de", "la", "el", "en", "es", "a", "los", "se", "del", "las", "por",
+    "un", "con", "no", "una", "su", "al", "lo", "como", "más", "pero", "sus", "le",
+    "ya", "o", "fue", "ha", "sí", "porque", "esta", "son", "entre", "cuando", "muy",
+    "sin", "sobre", "también", "me", "hasta", "hay", "donde", "quien", "desde",
+    "todo", "nos", "durante", "todos", "uno", "les", "ni", "contra", "otros", "ese",
+    "eso", "ante", "ellos", "e", "esto", "mí", "antes", "algunos", "qué", "unos",
+    "yo", "otro", "otras", "otra", "él", "tanto", "esa", "estos", "mucho", "quienes",
+    "nada", "muchos", "cual", "poco", "ella", "estar", "estas", "algunas", "algo",
+    "nosotros", "mi", "mis", "tus", "te", "ti", "tu", "sí", "mismo", "él", "sólo",
+    "ellas", "hay", "tú", "vosotros", "vosotras", "os", "míos", "mías", "tuyo",
+    "tuya", "tuyos", "tuyas", "suyo", "suya", "suyos", "suyas", "nuestro", "nuestra",
+    "nuestros", "nuestras", "vuestro", "vuestra", "vuestros", "vuestras"
+}
 
-# Introducción de la herramienta
-st.markdown("""
-Esta herramienta analiza documentos para verificar:
-- **Redacción y coherencia**.
-- **Alineación con objetivos de investigación**.
-- **Cumplimiento de estándares académicos**.
+def detect_language(text):
+    """
+    Detecta el idioma del texto utilizando `langdetect`.
+    """
+    try:
+        return detect(text)
+    except Exception:
+        return "unknown"
 
-Carga tu archivo para comenzar.
-""")
+def sentiment_analysis(text):
+    """
+    Realiza un análisis de sentimiento utilizando `TextBlob`.
+    """
+    try:
+        blob = TextBlob(text)
+        return {
+            "polarity": blob.sentiment.polarity,  # -1 (negativo) a 1 (positivo)
+            "subjectivity": blob.sentiment.subjectivity  # 0 (objetivo) a 1 (subjetivo)
+        }
+    except Exception:
+        return {"polarity": None, "subjectivity": None}
 
-# Widget para cargar documento
-uploaded_file = st.file_uploader("📤 Cargar documento", type=["docx", "pdf", "txt"])
+def analyze_text(text):
+    """
+    Realiza un análisis detallado del texto, incluyendo estadísticas de palabras y caracteres.
+    """
+    try:
+        language = detect_language(text)
+        word_count = len(text.split())
+        char_count = len(text)
+        sentence_count = len(re.findall(r'[.!?]', text))
+        
+        # Extraer palabras más comunes excluyendo stopwords
+        words = word_tokenize(text.lower())
+        filtered_words = [word for word in words if word not in STOPWORDS]
+        most_common_words = Counter(filtered_words).most_common(5)
 
-if uploaded_file:
-    with st.spinner("Procesando el archivo..."):
-        try:
-            # Procesar archivo cargado
-            content, sections = process_uploaded_file(uploaded_file)
+        # Análisis de sentimiento
+        sentiment = sentiment_analysis(text)
 
-            # Barra lateral: Navegación por secciones
-            st.sidebar.header("📚 Navegación del Documento")
-            selected_section = st.sidebar.selectbox(
-                "Selecciona una sección para analizar:",
-                options=list(sections.keys()),
-                format_func=lambda x: f"Sección: {x}"
-            )
+        return {
+            "language": language,
+            "word_count": word_count,
+            "char_count": char_count,
+            "sentence_count": sentence_count,
+            "most_common_words": most_common_words,
+            "sentiment": sentiment,
+        }
+    except Exception as e:
+        raise ValueError(f"Error en el análisis del texto: {e}")
 
-            # Mostrar contenido de la sección seleccionada
-            st.subheader(f"📖 Contenido de la Sección: {selected_section}")
-            st.write(sections[selected_section])
-
-            # Análisis de la sección
-            if st.button("🔍 Analizar esta sección"):
-                with st.spinner("Realizando análisis..."):
-                    try:
-                        analysis_result = analyze_text(sections[selected_section])
-                        st.success("Análisis completado:")
-                        st.json(analysis_result)
-                    except Exception as e:
-                        st.error(f"Error al realizar el análisis: {e}")
-
-            # Generar reporte de observaciones
-            if st.button("📋 Generar Reporte de Observaciones"):
-                with st.spinner("Generando reporte..."):
-                    try:
-                        report = generate_report(sections)
-                        st.success("Reporte generado con éxito:")
-                        st.download_button(
-                            label="Descargar Reporte",
-                            data=report,
-                            file_name="reporte_observaciones.txt",
-                            mime="text/plain"
-                        )
-                    except Exception as e:
-                        st.error(f"Error al generar el reporte: {e}")
-
-        except Exception as e:
-            st.error(f"Error al procesar el documento: {e}")
-else:
-    st.info("Por favor, carga un documento para comenzar.")
+def generate_wordcloud(text):
+    """
+    Genera una nube de palabras excluyendo palabras comunes (stopwords).
+    """
+    try:
+        words = word_tokenize(text.lower())
+        filtered_words = [word for word in words if word not in STOPWORDS]
+        wordcloud_text = " ".join(filtered_words)
+        wordcloud = WordCloud(width=800, height=400, background_color="white").generate(wordcloud_text)
+        plt.figure(figsize=(10, 5))
+        plt.imshow(wordcloud, interpolation="bilinear")
+        plt.axis("off")
+        return plt
+    except Exception as e:
+        raise ValueError(f"Error al generar la nube de palabras: {e}")
