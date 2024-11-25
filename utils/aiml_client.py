@@ -39,7 +39,7 @@ class AIMLClient:
         payload = {
             "text": text,
             "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Asegurar el uso del modelo especificado
-            "max_tokens": 200,  # Permitir hasta 200 tokens
+            "max_tokens": 500,  # Permitir hasta 500 tokens
             "temperature": 0.7,  # Asegurar que la temperatura sea 0.7
             "top_p": 0.9,  # Ajustar top_p para mayor creatividad
             "frequency_penalty": 0.5,  # Penalizar la frecuencia para evitar repeticiones
@@ -62,7 +62,7 @@ class AIMLClient:
         payload = {
             "text": text,
             "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Asegurar el uso del modelo especificado
-            "max_tokens": 200  # Permitir hasta 200 tokens
+            "max_tokens": 500  # Permitir hasta 500 tokens
         }
         return self._make_request(endpoint, payload)
 
