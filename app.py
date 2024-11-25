@@ -5,7 +5,7 @@ import logging
 from fpdf import FPDF
 
 try:
-    from utils.aiml_client2 import AIMLClient2
+    from utils.aiml_client import AIMLClient
     from utils.file_utils import extract_text
     from utils.text_analysis import analyze_text, generate_wordcloud
 except ImportError as e:
@@ -20,7 +20,7 @@ if not API_URL or not API_KEY:
     st.error("Faltan configuraciones en el archivo .env para la API.")
     raise ValueError("Configuración inválida para la API.")
 
-client = AIMLClient2(api_url=API_URL, api_key=API_KEY)
+client = AIMLClient(api_url=API_URL, api_key=API_KEY)
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
