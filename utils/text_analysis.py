@@ -57,6 +57,16 @@ def analyze_text(text):
         filtered_words = [word for word in words if word not in STOPWORDS]
         most_common_words = Counter(filtered_words).most_common(5)
         sentiment = sentiment_analysis(text)
+        
+        # Análisis de legibilidad
+        syllable_count = sum([len(re.findall(r'[aeiouáéíóúü]', word)) for word in words])
+        avg_sentence_length = word_count / sentence_count if sentence_count else 0
+        avg_syllables_per_word = syllable_count / word_count if word_count else 0
+        readability_score = 206.835 - 1.015 * avg_sentence_length - 84.6 * avg_syllables_per_word
+
+        # Análisis de diversidad léxica
+        unique_words = set(filtered_words)
+        lexical_diversity = len(unique_words) / word_count if word_count else 0
 
         return {
             "Idioma": language,
@@ -68,6 +78,8 @@ def analyze_text(text):
                 "Polaridad": sentiment["polarity"],
                 "Subjetividad": sentiment["subjectivity"]
             },
+            "Legibilidad": readability_score,
+            "Diversidad léxica": lexical_diversity
         }
     except Exception as e:
         raise ValueError(f"Error en el análisis del texto: {e}")

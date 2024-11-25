@@ -1,20 +1,30 @@
 import requests
 import re
 import logging
+from requests.adapters import HTTPAdapter
+from requests.packages.urllib3.util.retry import Retry
 
 class AIMLClient:
     def __init__(self, api_url, api_key):
         self.api_url = api_url
         self.api_key = api_key
+        self.session = self._create_session()
+
+    def _create_session(self):
+        session = requests.Session()
+        retries = Retry(total=5, backoff_factor=1, status_forcelist=[502, 503, 504])
+        session.mount("https://", HTTPAdapter(max_retries=retries))
+        return session
 
     def _make_request(self, endpoint, payload):
         headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         try:
-            response = requests.post(endpoint, headers=headers, json=payload)
+            response = self.session.post(endpoint, headers=headers, json=payload)
             response.raise_for_status()
             logging.info(f"API Response: {response.json()}")  # Agregar log para la respuesta de la API
             return response.json()
         except requests.exceptions.RequestException as e:
+            logging.error(f"Error al comunicarse con la API: {e}")
             raise ValueError(f"Error al comunicarse con la API: {e}")
 
     def analyze_text(self, text):

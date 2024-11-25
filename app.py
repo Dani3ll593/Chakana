@@ -25,8 +25,8 @@ client = AIMLClient(api_url=API_URL, api_key=API_KEY)
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
 
-st.set_page_config(page_title="Procesador de Documentos Inteligente", layout="wide", initial_sidebar_state="auto")
-st.title("📄 Procesador de Documentos Inteligente")
+st.set_page_config(page_title="Chakana - Procesador de Documentos Inteligente", layout="wide", initial_sidebar_state="auto")
+st.title("📄 Chakana - Procesador de Documentos Inteligente")
 
 st.markdown("""
 <style>
