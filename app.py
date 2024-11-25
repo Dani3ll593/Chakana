@@ -73,7 +73,7 @@ if st.button("🔍 Analizar texto pegado"):
                 analysis_result = analyze_text(pasted_text)
                 st.json(analysis_result)
                 academic_quality_result = client.analyze_academic_quality(pasted_text)
-                if academic_quality_result:
+                if academic_quality_result and 'analysis' in academic_quality_result[0]:
                     # Generar dos párrafos de resumen basados en el análisis del modelo
                     summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
                     summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
@@ -98,7 +98,7 @@ if uploaded_file:
                 analysis_result = analyze_text(text)
                 st.json(analysis_result)
                 academic_quality_result = client.analyze_academic_quality(text)
-                if academic_quality_result:
+                if academic_quality_result and 'analysis' in academic_quality_result[0]:
                     # Generar dos párrafos de resumen basados en el análisis del modelo
                     summary_paragraph_1 = academic_quality_result[0]['analysis'].get('summary_paragraph_1', "No se pudo generar el resumen.")
                     summary_paragraph_2 = academic_quality_result[0]['analysis'].get('summary_paragraph_2', "No se pudo generar el resumen.")
