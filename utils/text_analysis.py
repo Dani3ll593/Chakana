@@ -7,7 +7,12 @@ from textblob import TextBlob
 from nltk import pos_tag
 from nltk.tokenize import word_tokenize
 
-# Lista de stopwords comunes en español
+# Descargar recursos de NLTK
+import nltk
+nltk.download('punkt')
+nltk.download('averaged_perceptron_tagger')
+
+# Lista de palabras comunes en español (stopwords)
 STOPWORDS = {
     "y", "que", "de", "la", "el", "en", "es", "a", "los", "se", "del", "las", "por",
     "un", "con", "no", "una", "su", "al", "lo", "como", "más", "pero", "sus", "le",
@@ -45,16 +50,6 @@ def sentiment_analysis(text):
     except Exception:
         return {"polarity": None, "subjectivity": None}
 
-def pos_tagging(text):
-    """
-    Realiza el etiquetado de partes del discurso (POS tagging) usando NLTK.
-    """
-    try:
-        tokens = word_tokenize(text)
-        return pos_tag(tokens)
-    except Exception:
-        return []
-
 def analyze_text(text):
     """
     Realiza un análisis detallado del texto, incluyendo estadísticas, lenguaje,
@@ -85,21 +80,15 @@ def analyze_text(text):
     except Exception as e:
         raise ValueError(f"Error en el análisis del texto: {e}")
 
-def preprocess_text(text):
-    """
-    Limpia el texto eliminando palabras comunes (stopwords) y caracteres no deseados.
-    """
-    words = re.findall(r'\b\w+\b', text.lower())
-    filtered_words = [word for word in words if word not in STOPWORDS]
-    return " ".join(filtered_words)
-
 def generate_wordcloud(text):
     """
     Genera una nube de palabras excluyendo palabras comunes (stopwords).
     """
     try:
-        cleaned_text = preprocess_text(text)
-        wordcloud = WordCloud(width=800, height=400, background_color="white").generate(cleaned_text)
+        words = re.findall(r'\b\w+\b', text.lower())
+        filtered_words = [word for word in words if word not in STOPWORDS]
+        wordcloud_text = " ".join(filtered_words)
+        wordcloud = WordCloud(width=800, height=400, background_color="white").generate(wordcloud_text)
         plt.figure(figsize=(10, 5))
         plt.imshow(wordcloud, interpolation="bilinear")
         plt.axis("off")
