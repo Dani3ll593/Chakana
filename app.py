@@ -2,6 +2,7 @@ import os
 import streamlit as st
 from dotenv import load_dotenv
 import logging
+from fpdf import FPDF
 
 try:
     from utils.aiml_client import AIMLClient
@@ -69,6 +70,20 @@ uploaded_file = st.sidebar.file_uploader("📤 Cargar documento", type=["txt", "
 
 col1, col2 = st.columns([1, 1])
 
+def export_report(summary_paragraph_1, summary_paragraph_2, file_name="reporte_analisis.pdf"):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=12)
+    pdf.multi_cell(0, 10, "Reporte de Análisis de Calidad Académica")
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, "Resumen del Análisis:")
+    pdf.ln(5)
+    pdf.multi_cell(0, 10, summary_paragraph_1)
+    pdf.ln(10)
+    pdf.multi_cell(0, 10, summary_paragraph_2)
+    pdf.output(file_name)
+    return file_name
+
 with col1:
     st.subheader("Texto para Análisis")
     pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200, key="pasted_text")
@@ -134,6 +149,23 @@ with col2:
         st.markdown("### Resumen del Análisis")
         st.write(summary_paragraph_1)
         st.write(summary_paragraph_2)
+
+if st.button("📄 Exportar reporte"):
+    if 'summary_paragraph_1' in locals() and 'summary_paragraph_2' in locals():
+        try:
+            report_file = export_report(summary_paragraph_1, summary_paragraph_2)
+            st.success(f"Reporte exportado exitosamente: {report_file}")
+            with open(report_file, "rb") as file:
+                btn = st.download_button(
+                    label="Descargar reporte",
+                    data=file,
+                    file_name=report_file,
+                    mime="application/pdf"
+                )
+        except Exception as e:
+            st.error(f"Error al exportar el reporte: {e}")
+    else:
+        st.warning("No hay datos de análisis disponibles para exportar.")
 
 st.markdown("---")
 st.subheader("Términos más destacados")
