@@ -27,16 +27,17 @@ uploaded_file = st.sidebar.file_uploader("Carga un documento (.txt, .pdf, .docx)
 st.subheader("Pegue su texto aquí para analizar")
 pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200)
 
-if st.button("Analizar texto con IA"):
+# Análisis del texto pegado
+if st.button("Analizar texto pegado con IA"):
     if pasted_text.strip():
-        with st.spinner("Analizando texto con IA..."):
+        with st.spinner("Analizando texto pegado con IA..."):
             try:
                 # Análisis básico
                 basic_analysis = analyze_text(pasted_text)
                 st.write("### Resultados del análisis básico:")
                 st.json(basic_analysis)
 
-                # Análisis avanzado
+                # Análisis avanzado (calidad académica)
                 advanced_analysis = client.analyze_academic_quality(pasted_text)
                 st.write("### Resultados del análisis avanzado:")
                 st.json(advanced_analysis)
@@ -45,37 +46,52 @@ if st.button("Analizar texto con IA"):
     else:
         st.warning("Por favor, pegue un texto antes de analizar.")
 
-# Procesamiento del archivo si se carga
+# Procesamiento del archivo cargado
 if uploaded_file:
-    with st.spinner("Cargando documento..."):
+    with st.spinner("Procesando archivo cargado..."):
         try:
             text = extract_text(uploaded_file)
             st.success("Documento cargado con éxito.")
             st.write(f"### Contenido del documento ({len(text.split())} palabras):")
             st.text_area("Texto del documento", text, height=300)
 
-            # Botón para analizar el texto del archivo
-            if st.button("Analizar texto del documento con IA"):
-                with st.spinner("Analizando texto del documento con IA..."):
+            # Botón para análisis del archivo cargado
+            if st.button("Analizar archivo con IA"):
+                with st.spinner("Analizando archivo con IA..."):
                     try:
                         # Análisis básico
                         basic_analysis = analyze_text(text)
                         st.write("### Resultados del análisis básico:")
                         st.json(basic_analysis)
 
-                        # Análisis avanzado
-                        advanced_analysis = client.analyze_academic_quality(text)
-                        st.write("### Resultados del análisis avanzado:")
-                        st.json(advanced_analysis)
+                        # Análisis avanzado (calidad académica por sección)
+                        st.write("### Análisis por Sección:")
+                        results = client.analyze_academic_quality(text)
+                        for result in results:
+                            st.write(f"**Sección: {result['section_title']}**")
+                            st.json(result["analysis"] if "analysis" in result else result["error"])
 
                         # Generar nube de palabras
                         st.subheader("Nube de Palabras")
                         wordcloud_fig = generate_wordcloud(text)
                         st.pyplot(wordcloud_fig)
                     except Exception as e:
-                        st.error(f"Error al analizar el texto: {e}")
+                        st.error(f"Error al analizar el archivo: {e}")
         except Exception as e:
             st.error(f"Error al procesar el archivo: {e}")
+
+# Análisis de sentimiento del texto pegado
+if st.button("Analizar Sentimiento del Texto Pegado"):
+    if pasted_text.strip():
+        with st.spinner("Analizando sentimiento del texto pegado..."):
+            try:
+                sentiment = client.analyze_sentiment(pasted_text)
+                st.write("### Análisis de Sentimiento:")
+                st.json(sentiment)
+            except Exception as e:
+                st.error(f"Error al analizar el sentimiento: {e}")
+    else:
+        st.warning("Por favor, pegue un texto antes de analizar.")
 
 # Barra lateral de información
 st.sidebar.markdown("**Hecho con ❤️ por Streamlit**")
