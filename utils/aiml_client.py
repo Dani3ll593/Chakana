@@ -11,13 +11,10 @@ class AIMLClient:
 
     def analyze_text(self, text):
         """
-        Envía el texto completo para su análisis a la API de IA y retorna los resultados.
+        Envía el texto para análisis a la API. Ajustamos el payload y validamos la respuesta.
         """
         endpoint = f"{self.api_url}/analyze"
-        headers = {
-            "Authorization": f"Bearer {self.api_key}",
-            "Content-Type": "application/json"
-        }
+        headers = {"Authorization": f"Bearer {self.api_key}", "Content-Type": "application/json"}
         payload = {"text": text}
 
         try:

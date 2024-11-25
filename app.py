@@ -1,9 +1,9 @@
 import os
 import streamlit as st
 from dotenv import load_dotenv
-from aiml_client import AIMLClient
-from file_utils import extract_text, save_file
-from text_analysis import analyze_text, generate_wordcloud
+from utils.aiml_client import AIMLClient
+from utils.file_utils import extract_text, save_file
+from utils.text_analysis import analyze_text, generate_wordcloud
 
 # Cargar variables de entorno
 load_dotenv()
@@ -36,7 +36,7 @@ if st.button("Analizar texto con IA"):
                 st.write("### Resultados del análisis básico:")
                 st.json(basic_analysis)
 
-                # Análisis avanzado (calidad académica)
+                # Análisis avanzado
                 advanced_analysis = client.analyze_academic_quality(pasted_text)
                 st.write("### Resultados del análisis avanzado:")
                 st.json(advanced_analysis)
@@ -63,7 +63,7 @@ if uploaded_file:
                         st.write("### Resultados del análisis básico:")
                         st.json(basic_analysis)
 
-                        # Análisis avanzado (calidad académica)
+                        # Análisis avanzado
                         advanced_analysis = client.analyze_academic_quality(text)
                         st.write("### Resultados del análisis avanzado:")
                         st.json(advanced_analysis)
