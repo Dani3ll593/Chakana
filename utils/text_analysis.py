@@ -8,7 +8,10 @@ from nltk.tokenize import word_tokenize
 
 # Inicializar recursos de NLTK
 import nltk
-nltk.download('punkt')
+try:
+    nltk.download('punkt', quiet=True)
+except Exception as e:
+    raise RuntimeError(f"Error al inicializar recursos NLTK: {e}")
 
 # Stopwords comunes en español
 STOPWORDS = {
@@ -27,43 +30,32 @@ STOPWORDS = {
 }
 
 def detect_language(text):
-    """
-    Detecta el idioma del texto utilizando `langdetect`.
-    """
     try:
         return detect(text)
     except Exception:
         return "unknown"
 
 def sentiment_analysis(text):
-    """
-    Realiza un análisis de sentimiento utilizando `TextBlob`.
-    """
     try:
         blob = TextBlob(text)
         return {
-            "polarity": blob.sentiment.polarity,  # -1 (negativo) a 1 (positivo)
-            "subjectivity": blob.sentiment.subjectivity  # 0 (objetivo) a 1 (subjetivo)
+            "polarity": blob.sentiment.polarity,
+            "subjectivity": blob.sentiment.subjectivity
         }
     except Exception:
         return {"polarity": None, "subjectivity": None}
 
 def analyze_text(text):
-    """
-    Realiza un análisis detallado del texto, incluyendo estadísticas de palabras y caracteres.
-    """
     try:
         language = detect_language(text)
         word_count = len(text.split())
         char_count = len(text)
         sentence_count = len(re.findall(r'[.!?]', text))
-        
-        # Extraer palabras más comunes excluyendo stopwords
+
         words = word_tokenize(text.lower())
         filtered_words = [word for word in words if word not in STOPWORDS]
         most_common_words = Counter(filtered_words).most_common(5)
 
-        # Análisis de sentimiento
         sentiment = sentiment_analysis(text)
 
         return {
@@ -78,9 +70,6 @@ def analyze_text(text):
         raise ValueError(f"Error en el análisis del texto: {e}")
 
 def generate_wordcloud(text):
-    """
-    Genera una nube de palabras excluyendo palabras comunes (stopwords).
-    """
     try:
         words = word_tokenize(text.lower())
         filtered_words = [word for word in words if word not in STOPWORDS]
