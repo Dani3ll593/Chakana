@@ -1,5 +1,6 @@
 import requests
 import re
+import logging
 
 class AIMLClient:
     def __init__(self, api_url, api_key):
@@ -11,6 +12,7 @@ class AIMLClient:
         try:
             response = requests.post(endpoint, headers=headers, json=payload)
             response.raise_for_status()
+            logging.info(f"API Response: {response.json()}")  # Agregar log para la respuesta de la API
             return response.json()
         except requests.exceptions.RequestException as e:
             raise ValueError(f"Error al comunicarse con la API: {e}")

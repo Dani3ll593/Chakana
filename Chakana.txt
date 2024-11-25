@@ -1,43 +1,43 @@
-# Objetivo: Desarrollar una aplicación en Python utilizando Streamlit que realice un análisis de calidad académica sobre un texto proporcionado. 
-# La interfaz debe permitir al usuario cargar el texto, y la aplicación generará un análisis detallado en dos párrafos.
-# Define la calidad académica como la capacidad del texto de cumplir con criterios clave como claridad, coherencia, uso de fuentes confiables, 
-# precisión en la información, y su alineación con el tema académico.
+Desarrollar una aplicación en Python utilizando Streamlit que permita analizar la calidad académica de un texto proporcionado, utilizando la API del modelo "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo". La aplicación deberá incluir las siguientes funcionalidades y características:
 
-# Requisitos:
-# 1. Crear un diseño de interfaz simple pero funcional utilizando Streamlit.
-# 2. Incluir un área para que el usuario cargue o ingrese el texto.
-# 3. Implementar un análisis del texto basado en los siguientes aspectos:
-#    - Claridad y coherencia del mensaje.
-#    - Uso de lenguaje académico y apropiado para la audiencia objetivo.
-#    - Uso de fuentes y citas confiables.
-#    - Organización lógica y estructuración del contenido.
-#    - Contribución significativa al campo académico o tema en cuestión.
-# 4. Generar dos párrafos que resuman los hallazgos del análisis.
-# 5. Incluir un botón para analizar el texto cargado y mostrar los resultados en pantalla.
+Interfaz de usuario:
+Carga de texto:
 
-# Código sugerido:
-import streamlit as st
+Un área de texto donde el usuario pueda pegar directamente un párrafo o varios párrafos para el análisis.
+Un componente para cargar archivos de texto soportados, incluyendo .txt, .pdf y .docx.
+Botón de análisis:
 
-# Configuración de la aplicación
-st.title("Análisis de Calidad Académica")
-st.subheader("Analiza la calidad académica de un texto proporcionado")
+Un botón para enviar el texto ingresado al modelo "Meta-Llama-3.1-70B-Instruct-Turbo" para su evaluación.
+Resultados:
 
-# Entrada de texto
-user_input = st.text_area("Introduce o pega el texto académico aquí:")
+Mostrar en pantalla el análisis del texto en dos párrafos bien definidos:
+Párrafo 1: Evaluación general de la claridad, coherencia y organización lógica del contenido.
+Párrafo 2: Revisión específica sobre el uso de citas, fuentes confiables, precisión en la información y contribución al tema académico.
+Definición de calidad académica:
+Claves a evaluar:
+Claridad y coherencia: Qué tan claro y bien estructurado es el contenido.
+Lenguaje académico: Uso de terminología apropiada para la audiencia académica.
+Citas y fuentes confiables: Qué tan bien se soportan las afirmaciones con fuentes confiables.
+Precisión en la información: Alineación de los datos y argumentos con estándares académicos.
+Contribución al campo: Originalidad y relevancia en el contexto del tema tratado.
+Conexión con la API del modelo:
+Configuración de la API:
 
-# Botón para analizar
-if st.button("Analizar"):
-    if user_input:
-        # Lógica de análisis (implementar análisis de calidad académica)
-        # Párrafo 1: Resumen general de la claridad, coherencia, y calidad del contenido.
-        # Párrafo 2: Evaluación específica de las fuentes, citas y contribución al campo académico.
-        # Aquí se simula un análisis (puedes usar bibliotecas NLP como spaCy, nltk, o transformers)
-        paragraph_1 = "El texto presenta una claridad moderada con buena coherencia, aunque algunos puntos carecen de profundidad."
-        paragraph_2 = "El uso de fuentes confiables es adecuado, pero el texto podría beneficiarse de un análisis más crítico y un mayor enfoque académico."
+Utilizar un archivo .env para almacenar el API_KEY y la URL base del modelo "Meta-Llama".
+Crear un cliente API (basado en la clase AIMLClient) que gestione las solicitudes a la API del modelo.
+Interacción con el modelo:
 
-        # Mostrar resultados
-        st.write("### Resultados del Análisis")
-        st.write(paragraph_1)
-        st.write(paragraph_2)
-    else:
-        st.warning("Por favor, introduce un texto para analizar.")
+Enviar el texto al endpoint del modelo para realizar el análisis, asegurándose de estructurar los resultados en secciones claras y específicas.
+Manejar errores de la API y mostrar advertencias al usuario si ocurre un problema.
+Optimización del análisis:
+
+Dividir textos largos en secciones para enviarlas secuencialmente al modelo.
+Combinar los resultados en un formato legible y compacto para el usuario.
+Resultados visuales:
+Texto estructurado:
+Mostrar cada sección con encabezados claros y comentarios del modelo.
+Opcional: Agregar gráficos visuales como nubes de palabras para mostrar los términos más comunes en el texto analizado.
+Notas adicionales:
+Asegurar que la aplicación sea intuitiva y permita una experiencia fluida al usuario final.
+Implementar validaciones para textos vacíos o entradas incorrectas.
+Hacer que los resultados sean exportables en formato .txt o .pdf si el usuario lo solicita.
