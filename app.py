@@ -33,7 +33,7 @@ Esta herramienta permite:
 uploaded_file = st.sidebar.file_uploader("📤 Cargar documento", type=["txt", "pdf", "docx"])
 
 st.subheader("Pegue su texto aquí")
-pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200)
+pasted_text = st.text_area("Pegue un párrafo:", placeholder="Escriba o pegue texto aquí...", height=200, key="pasted_text")
 
 if st.button("🔍 Analizar texto pegado"):
     if pasted_text.strip():
@@ -46,7 +46,8 @@ if st.button("🔍 Analizar texto pegado"):
                 for result in academic_quality_result:
                     st.markdown(f"**{result['section_title']}**")
                     st.json(result['analysis'])
-                    st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
+                    if 'paragraph' in result['analysis']:
+                        st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
         except Exception as e:
             st.error(f"Error al analizar el texto: {e}")
     else:
@@ -57,7 +58,7 @@ if uploaded_file:
         with st.spinner("Procesando archivo..."):
             text = extract_text(uploaded_file)
             st.success("Documento cargado con éxito.")
-            st.text_area("Texto del documento", text, height=300)
+            st.text_area("Texto del documento", text, height=300, key="uploaded_text")
 
             if st.button("🔍 Analizar archivo"):
                 analysis_result = analyze_text(text)
@@ -67,7 +68,8 @@ if uploaded_file:
                 for result in academic_quality_result:
                     st.markdown(f"**{result['section_title']}**")
                     st.json(result['analysis'])
-                    st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
+                    if 'paragraph' in result['analysis']:
+                        st.markdown(f"**Párrafo de análisis:** {result['analysis']['paragraph']}")
                 st.pyplot(generate_wordcloud(text))
     except Exception as e:
         st.error(f"Error al procesar el archivo: {e}")
