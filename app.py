@@ -189,17 +189,16 @@ with col1:
                     if st.button("🔍 Analizar archivo"):
                         analysis_result, summary_paragraph_1, summary_paragraph_2, summary_paragraph_3 = perform_analysis(text)
                         if analysis_result:
-                            with col2:
-                                st.subheader("Resultados del Análisis")
-                                st.markdown("### Análisis de texto")
-                                st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area_file")
-                                st.markdown("### Análisis de IA")
-                                st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area_file")
-                                try:
-                                    wordcloud_image = generate_wordcloud(text)
-                                    st.pyplot(wordcloud_image)
-                                except ValueError as e:
-                                    st.error(f"Error al generar la nube de palabras: {e}")
+                            st.subheader("Resultados del Análisis")
+                            st.markdown("### Análisis de texto")
+                            st.text_area("Análisis de texto", format_analysis_result(analysis_result), height=200, key="analysis_text_area_file")
+                            st.markdown("### Análisis de IA")
+                            st.text_area("Análisis de IA", f"{summary_paragraph_1}\n\n{summary_paragraph_2}\n\n{summary_paragraph_3}", height=200, key="ia_analysis_text_area_file")
+                            try:
+                                wordcloud_image = generate_wordcloud(text)
+                                st.pyplot(wordcloud_image)
+                            except ValueError as e:
+                                st.error(f"Error al generar la nube de palabras: {e}")
                 except Exception as e:
                     st.error(f"Error al procesar el archivo: {e}")
 
