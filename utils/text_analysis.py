@@ -4,7 +4,8 @@ from wordcloud import WordCloud
 import matplotlib.pyplot as plt
 from langdetect import detect
 from textblob import TextBlob
-from nltk.tokenize import word_tokenize
+from nltk.tokenize import word_tokenize, sent_tokenize
+import logging
 
 # Inicializar recursos de NLTK
 import nltk
@@ -52,7 +53,7 @@ def analyze_text(text):
         language = detect_language(text)
         word_count = len(text.split())
         char_count = len(text)
-        sentence_count = len(re.findall(r'[.!?]', text))
+        sentence_count = len(sent_tokenize(text))
         words = word_tokenize(text.lower())
         filtered_words = [word for word in words if word not in STOPWORDS]
         most_common_words = Counter(filtered_words).most_common(5)
@@ -99,4 +100,5 @@ def generate_wordcloud(text):
         plt.axis("off")
         return plt
     except Exception as e:
+        logging.error(f"Error al generar la nube de palabras: {e}")
         raise ValueError(f"Error al generar la nube de palabras: {e}")
