@@ -19,7 +19,17 @@ class AIMLClient:
         endpoint = f"{self.api_url}/analyze"
         payload = {
             "text": text,
-            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"  # Asegurar el uso del modelo especificado
+            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Asegurar el uso del modelo especificado
+            "max_tokens": 200,  # Permitir hasta 200 tokens
+            "prompt": (
+                "Por favor, realiza una revisión de la calidad académica del siguiente texto. "
+                "Evalúa los siguientes aspectos: "
+                "1. Claridad y coherencia del mensaje. "
+                "2. Uso de lenguaje académico y apropiado para la audiencia objetivo. "
+                "3. Uso de fuentes y citas confiables. "
+                "4. Organización lógica y estructuración del contenido. "
+                "5. Contribución significativa al campo académico o tema en cuestión."
+            )
         }
         return self._make_request(endpoint, payload)
 
@@ -27,7 +37,8 @@ class AIMLClient:
         endpoint = f"{self.api_url}/sentiment"
         payload = {
             "text": text,
-            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"  # Asegurar el uso del modelo especificado
+            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo",  # Asegurar el uso del modelo especificado
+            "max_tokens": 200  # Permitir hasta 200 tokens
         }
         return self._make_request(endpoint, payload)
 
