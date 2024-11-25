@@ -13,7 +13,7 @@ except ImportError as e:
     raise
 
 load_dotenv()
-API_URL = "https://api.aimlapi.com"
+API_URL = "https://api.aimlapi.com/v1"
 API_KEY = "176f8cfc88294a3fbb13111fd6ea568d"
 
 if not API_URL or not API_KEY:
