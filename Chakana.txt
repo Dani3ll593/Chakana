@@ -1,0 +1,43 @@
+# Objetivo: Desarrollar una aplicación en Python utilizando Streamlit que realice un análisis de calidad académica sobre un texto proporcionado. 
+# La interfaz debe permitir al usuario cargar el texto, y la aplicación generará un análisis detallado en dos párrafos.
+# Define la calidad académica como la capacidad del texto de cumplir con criterios clave como claridad, coherencia, uso de fuentes confiables, 
+# precisión en la información, y su alineación con el tema académico.
+
+# Requisitos:
+# 1. Crear un diseño de interfaz simple pero funcional utilizando Streamlit.
+# 2. Incluir un área para que el usuario cargue o ingrese el texto.
+# 3. Implementar un análisis del texto basado en los siguientes aspectos:
+#    - Claridad y coherencia del mensaje.
+#    - Uso de lenguaje académico y apropiado para la audiencia objetivo.
+#    - Uso de fuentes y citas confiables.
+#    - Organización lógica y estructuración del contenido.
+#    - Contribución significativa al campo académico o tema en cuestión.
+# 4. Generar dos párrafos que resuman los hallazgos del análisis.
+# 5. Incluir un botón para analizar el texto cargado y mostrar los resultados en pantalla.
+
+# Código sugerido:
+import streamlit as st
+
+# Configuración de la aplicación
+st.title("Análisis de Calidad Académica")
+st.subheader("Analiza la calidad académica de un texto proporcionado")
+
+# Entrada de texto
+user_input = st.text_area("Introduce o pega el texto académico aquí:")
+
+# Botón para analizar
+if st.button("Analizar"):
+    if user_input:
+        # Lógica de análisis (implementar análisis de calidad académica)
+        # Párrafo 1: Resumen general de la claridad, coherencia, y calidad del contenido.
+        # Párrafo 2: Evaluación específica de las fuentes, citas y contribución al campo académico.
+        # Aquí se simula un análisis (puedes usar bibliotecas NLP como spaCy, nltk, o transformers)
+        paragraph_1 = "El texto presenta una claridad moderada con buena coherencia, aunque algunos puntos carecen de profundidad."
+        paragraph_2 = "El uso de fuentes confiables es adecuado, pero el texto podría beneficiarse de un análisis más crítico y un mayor enfoque académico."
+
+        # Mostrar resultados
+        st.write("### Resultados del Análisis")
+        st.write(paragraph_1)
+        st.write(paragraph_2)
+    else:
+        st.warning("Por favor, introduce un texto para analizar.")

@@ -17,11 +17,19 @@ class AIMLClient:
 
     def analyze_text(self, text):
         endpoint = f"{self.api_url}/analyze"
-        return self._make_request(endpoint, {"text": text})
+        payload = {
+            "text": text,
+            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"  # Asegurar el uso del modelo especificado
+        }
+        return self._make_request(endpoint, payload)
 
     def analyze_sentiment(self, text):
         endpoint = f"{self.api_url}/sentiment"
-        return self._make_request(endpoint, {"text": text})
+        payload = {
+            "text": text,
+            "model": "meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo"  # Asegurar el uso del modelo especificado
+        }
+        return self._make_request(endpoint, payload)
 
     def analyze_academic_quality(self, text):
         sections = self.split_into_sections(text)
