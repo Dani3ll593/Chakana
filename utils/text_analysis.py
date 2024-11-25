@@ -9,14 +9,16 @@ from nltk.tokenize import word_tokenize
 import nltk
 import os
 
-nltk_data_dir = "E:/HACKATONS/LLAMA/CHAKANA/Python/utils/nltk_data"  # Cambia esta ruta según tu sistema
+nltk.download('punkt', download_dir='E:/HACKATONS/LLAMA/CHAKANA/Python/utils/nltk_data')
+nltk_data_dir = "E:/HACKATONS/LLAMA/CHAKANA/Python/utils/nltk_data"
 os.makedirs(nltk_data_dir, exist_ok=True)
 nltk.data.path.append(nltk_data_dir)
 
 try:
-    nltk.download('punkt', download_dir=nltk_data_dir, quiet=True)
-except Exception as e:
-    raise RuntimeError(f"Error al descargar 'punkt': {e}")
+    from nltk.tokenize import word_tokenize
+except LookupError:
+    import nltk
+    nltk.download('punkt')
 
 # Stopwords comunes en español
 STOPWORDS = {
